@@ -113,10 +113,11 @@ My proposal is a 2D numpy array. Each row (first index) represents a single stat
 			\item \textbf{Reward already received in this episode}
 			\item \textbf{Reward received at the end of the episode}: This one has to be added subsequently at the end of the episode to each ocurred state.
 			\item \textbf{Reward gained after this state occurred:} This one is the difference of the two above. This should be our \textit{target} which we aim to maximize.
+			\item \textbf{Agent touches opponent \state{0,1}}: The simple agents consider dropping a bomb if they touch an opponent. This may be a very good indicator for dropping a bomb for our model.
 		\end{itemize}
 	\end{itemize}
-This gives us $6$ entries for each cell and $6$ entries at the end of the array. There are $17\times17$ cells in the arena. However, the cells located at the rim are always \textit{walls}. These do not need to be stored. What remains is a $15\times15$ grid. I am not sure whether we want to store cells with \textit{walls} at all, because these are always the same. They should add nothing to the state of the game.\\
-Therefore we have $15\times15=225$ entries ($15\times15-7\times7=176$ if we don't store walls) plus $6$ at the end of the array for each state (time step). Storing these total $231$($182$) entries in a numpy array might produce big amounts of data. We should consider specifying the data type explicitly. However, the numpy documentation states that the data type is chosen as the minimum type required to hold the objects in the sequence.
+This gives us $6$ entries for each cell and $7$ entries at the end of the array. There are $17\times17$ cells in the arena. However, the cells located at the rim are always \textit{walls}. These do not need to be stored. What remains is a $15\times15$ grid. I am not sure whether we want to store cells with \textit{walls} at all, because these are always the same. They should add nothing to the state of the game.\\
+Therefore we have $15\times15=225$ entries ($15\times15-7\times7=176$ if we don't store walls) plus $7$ at the end of the array for each state (time step). Storing these total $232$($183$) entries in a numpy array might produce big amounts of data. We should consider specifying the data type explicitly. However, the numpy documentation states that the data type is chosen as the minimum type required to hold the objects in the sequence.
 
 \subsection{Rewards}
 The most rewarded actions should be those which will win us the game. Those are collecting coins (1 point) and killing opponents (5 points). Therefore, I propose the same scaling between those two when rewarding them. \\
@@ -139,17 +140,28 @@ Dying should be (beware! wordplay:) gravely punished.
 \subsection{Estimator} 
 I don't know much about neural networks which is why I spent most of my thoughts on how to implement this with the models we used in the exercises. Plus, I like the idea of the challenge to come up with an agent which doesn't use a neural network. \\
 Since we want to estimate the expected reward of performing an action at in a given state, we need a regressor. This regressor needs to be highly flexible in order to cope with the variety of states. I guess the most flexible regressor we used would be a \textit{Random Forest Regressor}. On the one hand, this one would need tons of learning data but on the other hand, which proper regressor doesn't?\\
-This means, we would plug the data of the states and the received rewards into the model and get an estimate of what reward we could expect for what action. Since we need to distinguish between the six possible actions, we need six Random Forests. One for each action. Each forest trained only with the states after which the respective action was performed. 
+This means, we would plug the data of the states and the received rewards into the model and get an estimate of what reward we could expect for what action. Since we need to distinguish between the six possible actions, we need six Random Forests. One for each action. Each forest trained only with the states after which the respective action was performed. This also means that we need to store all data in six different set for six possible actions or store the action performed afterwards in the \textit{state vector}.
 
 \subsection{Learning algorithm}
-I propose to use the Max-Boltzmann method as described in \cite{paper} or something similar. It is mostly a $\epsilon$-greedy algorithm. But when it decides to explore, it doesn't choose randomly among the remaining actions but assigns probabilities corresponding to the value (expected reward) of the remaining action. This way, exploration is not just random but more targeted.
+I propose to use the Max-Boltzmann (MB) method as described in \cite{paper} or something similar. It is mostly a $\epsilon$-greedy algorithm. But when it decides to explore, it doesn't choose randomly among the remaining actions but assigns probabilities corresponding to the value (expected reward) of the remaining action. This way, exploration is not just random but more targeted.\par
+
+There is no point in letting the agent learn after every single episode. In the long run those learning interruptions will cost us a lot of time. Plus, it is very unlikely that the next episodes are similar to the one before which means that the learning will most likely not be applied in the subsequent episodes. Thus, the learning process itself should be divided into learning intervals of many episodes, say 100 to 1000, maybe even 10000 episodes, given the number of possible states. While we're already using the term \textit{episodes}, let's call those learning intervals \textit{seasons}.\par
+I propose the following procedure:
+\begin{enumerate}
+	\item Use the provided simple agent as our agent to play the first season. I would use the MB algorithm already in the first episode. This already gives us the possibility of exploration which I consider as important since the simple agent is fully determined and hard coded.
+	\item Use the data of the first season to train our model. 
+	\item From now on, let the agent rely only on the predictions of our model. Create data, explore according to the MB algorithm. 
+	\item Use the data of all former seasons to again train our model.
+	\item Repeat the two former steps.
+\end{enumerate}
+The simple agents should be good sparring partners to start with. They are very good at avoiding bombs but sometimes lack the ability to collect coins. We might improve this ability in the simple agent code to get better starting conditions.
 \subsection{Necessary functions}
 Some functions that need to be implemented in order to prepare everything:
 \begin{itemize}
 	\item Calculate danger levels of each cell
-	\item Insert \textit{coins} into state array
-	\item Insert \textit{opponents} into state array
-	\item Insert \textit{self} into state array
+	\item Insert \textit{coins} into \textit{state vector}
+	\item Insert \textit{opponents} into \textit{state vector}
+	\item Insert \textit{self} into \textit{state vector}
 \end{itemize}
 We need to decide what structure the \textit{state vector} should have. There are two ways:
 \begin{enumerate}

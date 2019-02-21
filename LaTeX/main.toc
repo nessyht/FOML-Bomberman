@@ -4,4 +4,4 @@
 \contentsline {subsection}{\numberline {1.2}Rewards}{3}
 \contentsline {subsection}{\numberline {1.3}Estimator}{4}
 \contentsline {subsection}{\numberline {1.4}Learning algorithm}{4}
-\contentsline {subsection}{\numberline {1.5}Necessary functions}{4}
+\contentsline {subsection}{\numberline {1.5}Necessary functions}{5}
