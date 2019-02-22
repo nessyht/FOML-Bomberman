@@ -85,6 +85,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \renewcommand{\thesection}{\arabic{section}}
+\chapter{Preliminaries}
 \section{Heins thoughts}
 Tasks to be done are:
 	\begin{itemize}
@@ -169,6 +170,98 @@ We need to decide what structure the \textit{state vector} should have. There ar
 	\item All data of one feature (e.g. coin) for all cells, then all data of the next feature for all cells and so on \dots
 \end{enumerate}
 In both cases, the functions that insert the values into the array should make use of the slicing possibilities of numpy arrays (e.g. \code{x[starting point:end point:stepsize]}). In the first case, only every sixth entry represents the same feature. In the second case, the first hundred entries represent only one feature for different cells.
+
+\section{Karls thoughts}
+
+How this project can be approached:
+	\begin{itemize}
+		\item Neural Network approach \textit{vs.} Classical Machine learning approach
+		\begin{itemize}
+			\item Supervised learning \textit{vs.} Reinforcement learning \textit{vs.} Unsupervised learning
+			\item Feature selection to determine relevant information the agent should "see" and learn from
+		\end{itemize}
+		\item Data management for training - not necessary as we will be collecting all the relevant data while training rather than using a large pre-compiled dataset
+	\end{itemize}
+
+As we do not have access to more than our own laptops which can not be classed as high performance systems with low end dedicated GPUs training neural networks may be impractical and time consuming.
+
+\subsection{Neural Networks}
+As we didn't cover neural networks in the lecture but are allowed to apply them to this Project I explored it as an option despite knowing we are likely to select the classical approach.
+Some algorithms that are worth exploring are:
+	\begin{itemize}
+		\item Supervised learning:
+		\begin{itemize}
+			\item Gradient descent involves forming a continuous error function using rewards to minimize
+		\end{itemize}
+		\item Reinforcement learning:
+		\begin{itemize}
+			\item Q-Learning (as covered in lectures)
+			\item Genetic Algorithm:
+			\begin{itemize}
+				\item Training occurs through improvements from generation to generation by improving the strength and bias values for the edges of the neural network (stored in a 1D array). Each generation has a set number of instances that follow a variation of the previous generations values. To decide which of the instances in the previous generation had the best strength and bias values a scoring system must be created based on the performance of each instance.
+				\item Outputs are predetermined as 5 movement options (up, down, left, right, stand still) and the Bomb placement option
+				\item Factors to be decided on:
+				\begin{itemize}
+					\item Inputs e.g. \textit{weighted score of distance to enemies/crates/coins/bombs}
+					\item Number of hidden layers and nodes (not sure how this is done yet)
+					\item Method for genetic variation e.g. \textit{ranking by score and weighting the likelihood for this process to be selected, random selection}. This is the exploitation aspect. Some values however should be randomly changed or multiple arrays crossed together (like nature) to increase the likelihood of finding the global minimum rather than local (exploration.
+				\end{itemize}
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}		
+
+\subsection{Classical approach}
+We could use Q-learning to train a $\epsilon$-greedy agent. We want to find the optimal policy \textbf{Q} to solve the game.
+
+Here its important to identify the 2 sets of attributes that contribute to decision making, \textbf{state} and \textbf{action}. The state will be input to decision making function to determine the action, the features that describe the state however must first be decided on.
+To reduce runtime it may be advantageous to perform a dimension reduction if it becomes clear that some features for example the states of the cells outside of a 5x5 radius around the agent have very little impact on the decision. This could be particularly important in the early tests before the final train to reduce training time required when for example testing various reward value boundaries.
+
+\subsubsection{State appraisal}
+Before a decision can be reached as to the next action clearly the state of the board must first be assessed. With an almost infinite number of possible inputs possible it is important to have as few and as relevant features as possible.
+
+Ideas to test/discuss:
+\begin{itemize}
+	\item Are all accessible fields relevant
+	\item Is it possible to approximate the state with knowledge about only the non-empty fields. In extreme cases this can be 2 (final 2 agents) or 176 (all fields occupied, although this is a stalemate) so this is likely not constructive.
+	\item How should the distances to other agents or items be stored? Possibilities include:
+	\begin{itemize}
+	\item The route that could be taken
+	\item Only the coordinates
+	\item The number of moves required to move the the desired opponent or coins field and the direction. Here the shorter route could also be through boxes and therefore include bomb wait times
+	\end{itemize}	 
+	\item Should any previous states have a weighted input? - probably not, could be useful in some edge cases maybe?
+\end{itemize}
+
+\subsubsection{Rewards}
+Naively we want to positively reinforce proactive, safe actions and negatively reinforce hazardous or even fatal actions so we should set our rewards based on this structure. This may however not always lead to the optimal solution as there are some situations where a sacrifice can lead to a greater boon in later steps e.g. \textit{queen sacrifice for checkmate in chess}.
+
+We have essentially 3 choices for how to issue rewards:
+\begin{itemize}
+	\item Updating Q after each episode:
+	\begin{itemize}
+		\item This leads to faster training times as the entire episode can play out without interruptions, however each episode leads to slower improvement as the Agent can only perceive the results of all decisions made during the episode.
+	\end{itemize}
+
+	\item Stepwise Q updates:
+	\begin{itemize}
+		\item Very slow episodes (opposite of episodic updates above)
+		\item Ultimately it will depend on how we set our rewards, whether a movement to a cell should be rewarded based on proximity to other agents/bombs or coins and how we allow these factors to influence the positivity or negativity of an action. I.e. A step towards a coin that is also a step into an exploding bomb should lead to a negative reward.
+		\item This would allow for punishment for the repetition of actions, such as the movement to a previously occupied square which may be undesirable and therefore punished with a small negative value
+		\item Decisions that are not allowed in certain situations such as movement into a wall/crate should also be punished harshly
+	\end{itemize}			
+	\item N-step Q updates: see above every N steps
+\end{itemize}
+
+\subsubsection{Exploration vs. Exploitation}
+\begin{itemize}
+	\item e-greedy policy 
+	
+	[[learn to Tex maths]]
+	\item soft max policy to max the "Temperature" S over time
+	
+	[[learn to Tex maths]]
+\end{itemize}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
