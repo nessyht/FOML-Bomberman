@@ -73,6 +73,7 @@ class AgentProcess(mp.Process):
                 self.wlogger.info('Received global exit message')
                 break
             self.wlogger.info(f'STARTING ROUND #{self.round}')
+            self.fake_self.rewards = []
 
             # Take steps until exit message for current round is received
             while True:
@@ -93,6 +94,9 @@ class AgentProcess(mp.Process):
                     self.wlogger.info('Process intermediate rewards')
                     try:
                         self.code.reward_update(self.fake_self)
+                        
+                        # print reward for last step
+                        # print(self.fake_self.rewards[-1])
                     except Exception as e:
                         self.wlogger.exception(f'Error in callback function: {e}')
                     self.wlogger.debug('Set flag to indicate readiness')

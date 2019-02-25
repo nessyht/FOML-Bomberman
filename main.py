@@ -1,7 +1,6 @@
 
 from time import time, sleep
 import contextlib
-from time import time
 
 with contextlib.redirect_stdout(None):
     import pygame
@@ -41,7 +40,7 @@ def main():
 
     # Initialize environment and agents
     world = BombeRLeWorld([
-            ('simple_agent', False),
+            ('simple_agent', True),
             ('simple_agent', False),
             ('simple_agent', False),
             ('simple_agent', False)
