@@ -12,6 +12,7 @@ from pygame.transform import smoothscale
 from items import *
 from settings import s, e
 
+from functions import create_state_vector, store_next_action
 
 class IgnoreKeyboardInterrupt(object):
     """Context manager that protects enclosed code from Interrupt signals."""
@@ -108,11 +109,26 @@ class AgentProcess(mp.Process):
                 t = time()
                 try:
                     self.code.act(self.fake_self)
+        
                 except KeyboardInterrupt:
                     self.wlogger.warn(f'Got interrupted by timeout')
                 except Exception as e:
                     self.wlogger.exception(f'Error in callback function: {e}')
-
+                 
+                # CHANGED: 
+                # I guess this is the place where we don't get interrupted by timeout anymore
+                
+                # Creation of state vector
+                
+                # Check whether creation of state vector works
+                if self.fake_self.game_state['step'] == 10:
+                    if self.train_flag.is_set():                
+                        state_vector = create_state_vector(self.fake_self)
+                        self.wlogger.info(f'State vector has length {state_vector.shape[0]}.')
+                    
+                # TODO: store_next_action()
+                
+                
                 # Send action and time taken back to main process
                 with IgnoreKeyboardInterrupt():
                     t = time() - t

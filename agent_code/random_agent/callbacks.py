@@ -7,7 +7,7 @@ def setup(agent):
 
 def act(agent):
     agent.logger.info('Pick action at random')
-    agent.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB'], p=[.23, .23, .23, .23, .08])
+    agent.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'WAIT'], p=[.23, .23, .23, .23, .08])
 
 def reward_update(agent):
     pass

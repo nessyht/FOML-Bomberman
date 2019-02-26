@@ -44,6 +44,7 @@ def main():
             ('simple_agent', False),
             ('simple_agent', False),
             ('simple_agent', False)
+
         ])
     # world = ReplayWorld('Replay 2019-01-30 16:57:42')
     user_inputs = []
@@ -107,6 +108,8 @@ def main():
                     last_frame = time()
 
     world.end()
+
+
 
 
 if __name__ == '__main__':
