@@ -110,7 +110,7 @@ class AgentProcess(mp.Process):
                     self.wlogger.warn(f'Got interrupted by timeout')
                 except Exception as e:
                     self.wlogger.exception(f'Error in callback function: {e}')
-                """    
+                 
                 # CHANGED: 
                 # I guess this is the place where we don't get interrupted by timeout anymore
                 
@@ -123,7 +123,7 @@ class AgentProcess(mp.Process):
                         self.wlogger.info(f'State vector has length {state_vector.shape[0]}.')
                     
                 # TODO: store_next_action()
-                """
+                
                 
                 # Send action and time taken back to main process
                 with IgnoreKeyboardInterrupt():
