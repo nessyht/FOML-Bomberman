@@ -28,6 +28,24 @@ class BombeRLeWorld(object):
         self.colors = ['blue', 'green', 'yellow', 'pink']
         self.setup_agents(agents)
 
+        # CHANGED:
+        # Add variables which collect training data; Will later be accessed by main.py:
+        
+        self.states = None  # All states occurred during the season
+        self.actions = None # All actions chosen after respective state occurred
+        self.rewards = None # All cummulated rewards received after respective state occurred
+        
+        self.current_round_states = None
+        self.current_round_actions = None
+        self.current_round_rewards = None
+        
+        self.current_state = None
+        self.current_action = None
+        self.current_reward = None
+        
+        # END OF CHANGED
+        
+        
         # Get the game going
         self.round = 0
         self.running = False
