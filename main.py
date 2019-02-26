@@ -41,7 +41,7 @@ def main():
 
     # Initialize environment and agents
     world = BombeRLeWorld([
-            ('dagobert', False),
+            ('my_agent', True),
             ('simple_agent', False),
             ('simple_agent', False),
             ('simple_agent', False)
@@ -108,6 +108,8 @@ def main():
                     last_frame = time()
 
     world.end()
+
+
 
 
 if __name__ == '__main__':

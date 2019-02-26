@@ -104,7 +104,7 @@ def act(self):
             if (0 < i < bomb_map.shape[0]) and (0 < j < bomb_map.shape[1]):
                 bomb_map[i,j] = min(bomb_map[i,j], t)
                 
-    # Store the state
+    #self.wlogger.info(f'Current position is {x},{y}.')
     
 
     # If agent has been in the same location three times recently, it's a loop
@@ -228,4 +228,3 @@ def end_of_episode(self):
     final step. You should place your actual learning code in this method.
     """
     self.logger.debug(f'Encountered {len(self.events)} game event(s) in final step')
-    
