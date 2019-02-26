@@ -8,7 +8,7 @@ def create_state_vector(self):
     """
     
     # Import available data
-    arena = self.game_state['arena'].copy()
+    arena = self.game_state['arena']
     x, y, _, bombs_left = self.game_state['self']
     bombs = self.game_state['bombs']
     bomb_xys = [(x,y) for (x,y,t) in bombs]
