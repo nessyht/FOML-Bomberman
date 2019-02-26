@@ -41,10 +41,10 @@ def main():
 
     # Initialize environment and agents
     world = BombeRLeWorld([
-            ('dagobert', False),
-            ('simple_agent', False),
-            ('simple_agent', False),
-            ('simple_agent', False)
+            ('user_agent', True),
+            ('random_agent', False),
+            ('random_agent', False),
+            ('random_agent', False)
         ])
     # world = ReplayWorld('Replay 2019-01-30 16:57:42')
     user_inputs = []
@@ -108,6 +108,8 @@ def main():
                     last_frame = time()
 
     world.end()
+
+
 
 
 if __name__ == '__main__':

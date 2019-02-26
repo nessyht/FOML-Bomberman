@@ -6,6 +6,7 @@ from collections import deque
 
 from settings import s
 
+import pickle # store objects on disk
 
 def look_for_targets(free_space, start, targets, logger=None):
     """Find direction of closest target that can be reached via free tiles.
@@ -102,6 +103,9 @@ def act(self):
         for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
             if (0 < i < bomb_map.shape[0]) and (0 < j < bomb_map.shape[1]):
                 bomb_map[i,j] = min(bomb_map[i,j], t)
+                
+    # Store the state
+    
 
     # If agent has been in the same location three times recently, it's a loop
     if self.coordinate_history.count((x,y)) > 2:
@@ -224,3 +228,4 @@ def end_of_episode(self):
     final step. You should place your actual learning code in this method.
     """
     self.logger.debug(f'Encountered {len(self.events)} game event(s) in final step')
+    

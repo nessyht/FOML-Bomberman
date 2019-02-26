@@ -6,6 +6,7 @@ from collections import deque
 
 from settings import s
 
+import pickle # store objects on disk
 
 def look_for_targets(free_space, start, targets, logger=None):
     """Find direction of closest target that can be reached via free tiles.
@@ -28,21 +29,11 @@ def look_for_targets(free_space, start, targets, logger=None):
     dist_so_far = {start: 0}
     best = start
     best_dist = np.sum(np.abs(np.subtract(targets, start)), axis=1).min()
-    # Line above: find shortest distance. We can only move with taxi cab norm. Thus using np.abs, not np.square
-    
-    #coins = self.game_state['coins']
-    #number_of_coins = len(coins)
-    
+
     while len(frontier) > 0:
-        current = frontier.pop(0) # remove first (index 0) item from frontier and return it
+        current = frontier.pop(0)
         # Find distance from current position to all targets, track closest
-        distances = np.sum(np.abs(np.subtract(targets, current)), axis=1)
-        # First 'number_of_coins' entries are the positions of coins
-        # Reduce those distances:
-        #distances[:number_of_coins] /= 2
-        # Find minimal distance
-        d = distances.min()
-        
+        d = np.sum(np.abs(np.subtract(targets, current)), axis=1).min()
         if d + dist_so_far[current] <= best_dist:
             best = current
             best_dist = d + dist_so_far[current]
@@ -112,6 +103,9 @@ def act(self):
         for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
             if (0 < i < bomb_map.shape[0]) and (0 < j < bomb_map.shape[1]):
                 bomb_map[i,j] = min(bomb_map[i,j], t)
+                
+    #self.wlogger.info(f'Current position is {x},{y}.')
+    
 
     # If agent has been in the same location three times recently, it's a loop
     if self.coordinate_history.count((x,y)) > 2:
