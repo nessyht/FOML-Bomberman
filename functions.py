@@ -18,6 +18,7 @@ def create_state_vector(self):
     agent_state = np.zeros((arena.shape))
     #loot_state = np.zeros((arena.shape))
     #bomb_state = np.zeros((arena.shape))
+
     x, y, _, bombs_left = self.game_state['self']
     bombs = self.game_state['bombs']
     others = [(x,y) for (x,y,n,b) in self.game_state['others']]

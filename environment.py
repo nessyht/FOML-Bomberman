@@ -28,6 +28,20 @@ class BombeRLeWorld(object):
         self.colors = ['blue', 'green', 'yellow', 'pink']
         self.setup_agents(agents)
 
+        # CHANGED:
+        # Add variables which collect training data; Will later be accessed by main.py:
+        
+        self.states = np.empty((2, 17 * 17 * 5 + 6))  # All states occurred during the season
+        self.actions = [] # All actions chosen after respective state occurred
+        #self.rewards = None # All cummulated rewards received after respective state occurred
+        
+        self.current_round_states = np.empty((2, 17 * 17 * 5 + 6))
+        self.current_round_actions = []
+        #self.current_round_rewards = None        
+        
+        # END OF CHANGED
+        
+        
         # Get the game going
         self.round = 0
         self.running = False
@@ -82,6 +96,13 @@ class BombeRLeWorld(object):
 
 
     def new_round(self):
+        
+        # CHANGED:
+        # clear current round states and actions
+        self.current_round_states = np.empty((2, 17 * 17 * 5 + 6))
+        self.current_round_actions = []
+        
+        # END OF CHANGED
         if self.running:
             self.logger.warn('New round requested while still running')
             self.end_round()
@@ -278,6 +299,15 @@ class BombeRLeWorld(object):
     def put_down_agent(self, agent):
         # Send exit message to end round for this agent
         self.logger.debug(f'Send exit message to end round for {agent.name}')
+        
+        # CHANGED:
+        # store training data
+        
+        if agent.train_flag.is_set():
+            self.current_round_states = np.concatenate((self.current_round_states, agent.process.state_vectors[2:,:]))
+            self.current_round_actions.extend(agent.process.actions)
+        # END OF CHANGED
+        
         agent.pipe.send(self.get_state_for_agent(agent, exit=True))
         agent.ready_flag.wait()
         agent.ready_flag.clear()
