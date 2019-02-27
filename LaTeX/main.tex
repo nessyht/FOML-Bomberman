@@ -252,6 +252,8 @@ We have essentially 3 choices for how to issue rewards:
 	\item N-step Q updates: see above every N steps
 \end{itemize}
 
+Importantly the values for rewards should be small to ensure numerical stability in later operations
+
 \subsubsection{Exploration vs. Exploitation}
 \begin{itemize}
 	\item e-greedy policy 
@@ -262,7 +264,18 @@ We have essentially 3 choices for how to issue rewards:
 	[[learn to Tex maths]]
 \end{itemize}
 
+\chapter{Primary steps to create initial learning data}
 
+\section{Karls observations}
+
+These are just notes to document stages of development and note questions that arise.
+\subsection{The state matrix}
+\begin{itemize}
+	\item How should a bombs presence be documented in the 'state' matrix? 
+	\item Should a bomb timer be the input?
+	\item Is there any value in including the fields that have an explosion in them? 
+	I can't think of a situation in which this would be relevant to making a decision for the next action.
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{111}

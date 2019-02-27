@@ -4,7 +4,7 @@ from random import shuffle
 from time import time, sleep
 from collections import deque
 
-from settings import s
+from settings import s, e
 
 import pickle # store objects on disk
 
@@ -129,6 +129,7 @@ def act(self):
     if (x,y-1) in valid_tiles: valid_actions.append('UP')
     if (x,y+1) in valid_tiles: valid_actions.append('DOWN')
     if (x,y)   in valid_tiles: valid_actions.append('WAIT')
+    
     # Disallow the BOMB action if agent dropped a bomb in the same spot recently
     if (bombs_left > 0) and (x,y) not in self.bomb_history: valid_actions.append('BOMB')
     self.logger.debug(f'Valid actions: {valid_actions}')
@@ -143,6 +144,7 @@ def act(self):
                     and ([arena[x+1,y], arena[x-1,y], arena[x,y+1], arena[x,y-1]].count(0) == 1)]
     crates = [(x,y) for x in range(1,16) for y in range(1,16) if (arena[x,y] == 1)]
     targets = coins + dead_ends + crates
+    
     # Add other agents as targets if in hunting mode or no crates/coins left
     if self.ignore_others_timer <= 0 or (len(crates) + len(coins) == 0):
         targets.extend(others)
@@ -217,9 +219,25 @@ def reward_update(self):
     agent based on these events and your knowledge of the (new) game state. In
     contrast to act, this method has no time limit.
     """
+    
     self.logger.debug(f'Encountered {len(self.events)} game event(s)')
+    
+    # what to do when interrupted or when round survived?
+    # CHANGED KT-25.02
+    reward = 0
+    for event in self.events:
 
-
+        if event == e.INVALID_ACTION:
+            reward = reward - 0.1
+        elif event == e.CRATE_DESTROYED:
+            reward = reward + 0.01            
+        elif event == e.COIN_COLLECTED:
+            reward = reward + 0.1
+        elif event == e.KILLED_OPPONENT:
+            reward == reward + 0.5
+    
+    self.rewards.append(reward)
+    # CHANGED KT-25.02
 def end_of_episode(self):
     """Called at the end of each game to hand out final rewards and do training.
 
@@ -228,4 +246,24 @@ def end_of_episode(self):
     final step. You should place your actual learning code in this method.
     """
     self.logger.debug(f'Encountered {len(self.events)} game event(s) in final step')
+
+    # CHANGED KT-25.02
+    reward = 0
+    for event in self.events:
+        
+        if event == e.GOT_KILLED:
+            reward = reward - 0.5
+        elif event == e.KILLED_SELF:
+            reward = reward - 0.4
+        if event == e.INVALID_ACTION:
+            reward = reward - 0.1
+        elif event == e.CRATE_DESTROYED:
+            reward = reward + 0.01            
+        elif event == e.COIN_COLLECTED:
+            reward = reward + 0.1
+        elif event == e.KILLED_OPPONENT:
+            reward == reward + 0.5
+    
+    self.rewards.append(reward)
+    # CHANGED KT-25.02
     
