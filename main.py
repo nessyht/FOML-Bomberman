@@ -41,7 +41,7 @@ def main():
 
     # Initialize environment and agents
     world = BombeRLeWorld([
-            ('simple_agent', True),
+            ('simple_agent', False),
             ('simple_agent', False),
             ('simple_agent', False),
             ('simple_agent', False)
@@ -113,9 +113,9 @@ def main():
         
         # Add data of the current round to the data of the entire season
         
-        world.states = np.concatenate((world.states, world.current_round_states)[2:,:])            
-        world.actions = np.concatenate((world.actions, world.current_round_actions))            
-        world.rewards = np.concatenate((world.rewards, world.current_round_rewards))
+        world.states = np.concatenate((world.states, world.current_round_states[2:,:]))            
+        world.actions.extend(world.current_round_actions)            
+        #world.rewards = np.concatenate((world.rewards, world.current_round_rewards))
         
         # END OF CHANGED
 
@@ -124,7 +124,7 @@ def main():
     
     states = world.states   # All states occurred during the season
     actions = world.actions # All actions chosen after respective state occurred
-    rewards = world.rewards # All cummulated rewards received after respective state occurred
+    #rewards = world.rewards # All cummulated rewards received after respective state occurred
     
     # END OF CHANGED
     

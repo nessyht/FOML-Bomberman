@@ -45,6 +45,9 @@ class AgentProcess(mp.Process):
         
         # This is necessary because it makes using np.concatenate much easier
         
+        # Add list which stores all chosen actions
+        self.actions = []
+        
         # END OF CHANGED
 
     def run(self):
@@ -117,6 +120,7 @@ class AgentProcess(mp.Process):
                 self.fake_self.next_action = 'WAIT'
                 t = time()
                 try:
+                    # Choose next action
                     self.code.act(self.fake_self)
                     
                     # CHANGED: 
@@ -127,10 +131,14 @@ class AgentProcess(mp.Process):
                     # Check whether creation of state vector works
                     if self.fake_self.game_state['step'] == 10: # delete this condition later
                         if self.train_flag.is_set():
+                            
+                            # store state vector
                             self.state_vectors = np.concatenate((self.state_vectors, create_state_vector(self.fake_self)))
-                            self.wlogger.info(f'State vector added.')
-                        
-                    # TODO: store_next_action()
+                            self.wlogger.info(f'State vector added by agent.')
+                            
+                            # store chosen action
+                            self.actions.append(self.next_action)
+                            self.wlogger.info('Stored next action.')
                     
                     # END OF CHANGED
                 
