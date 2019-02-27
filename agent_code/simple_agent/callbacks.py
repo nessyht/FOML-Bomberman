@@ -129,6 +129,7 @@ def act(self):
     if (x,y-1) in valid_tiles: valid_actions.append('UP')
     if (x,y+1) in valid_tiles: valid_actions.append('DOWN')
     if (x,y)   in valid_tiles: valid_actions.append('WAIT')
+    
     # Disallow the BOMB action if agent dropped a bomb in the same spot recently
     if (bombs_left > 0) and (x,y) not in self.bomb_history: valid_actions.append('BOMB')
     self.logger.debug(f'Valid actions: {valid_actions}')
@@ -143,6 +144,7 @@ def act(self):
                     and ([arena[x+1,y], arena[x-1,y], arena[x,y+1], arena[x,y-1]].count(0) == 1)]
     crates = [(x,y) for x in range(1,16) for y in range(1,16) if (arena[x,y] == 1)]
     targets = coins + dead_ends + crates
+    
     # Add other agents as targets if in hunting mode or no crates/coins left
     if self.ignore_others_timer <= 0 or (len(crates) + len(coins) == 0):
         targets.extend(others)

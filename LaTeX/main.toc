@@ -12,3 +12,6 @@
 \contentsline {subsubsection}{State appraisal}{8}% 
 \contentsline {subsubsection}{Rewards}{8}% 
 \contentsline {subsubsection}{Exploration vs. Exploitation}{9}% 
+\contentsline {chapter}{\numberline {2}Primary steps to create initial learning data}{10}% 
+\contentsline {section}{\numberline {1}Karls observations}{10}% 
+\contentsline {subsection}{\numberline {1.1}The state matrix}{10}% 
