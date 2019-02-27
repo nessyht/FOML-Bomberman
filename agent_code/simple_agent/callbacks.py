@@ -223,6 +223,7 @@ def reward_update(self):
     self.logger.debug(f'Encountered {len(self.events)} game event(s)')
     
     # what to do when interrupted or when round survived?
+    # CHANGED KT-25.02
     reward = 0
     for event in self.events:
 
@@ -236,7 +237,7 @@ def reward_update(self):
             reward == reward + 0.5
     
     self.rewards.append(reward)
-
+    # CHANGED KT-25.02
 def end_of_episode(self):
     """Called at the end of each game to hand out final rewards and do training.
 
@@ -246,7 +247,7 @@ def end_of_episode(self):
     """
     self.logger.debug(f'Encountered {len(self.events)} game event(s) in final step')
 
-    
+    # CHANGED KT-25.02
     reward = 0
     for event in self.events:
         
@@ -264,5 +265,5 @@ def end_of_episode(self):
             reward == reward + 0.5
     
     self.rewards.append(reward)
-
+    # CHANGED KT-25.02
     

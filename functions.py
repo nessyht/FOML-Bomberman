@@ -6,11 +6,11 @@ def create_state_vector(self):
     This function stores/returns the current state of the game in a numpy array.
     The current state of the game is stored in 'self'.
     """
-    
+    # CHANGED KT-26.02/27-02
     # Import available data
     arena = self.game_state['arena'].copy()    
     
-    ''' Create empty arena with 3D vector per cell for state information
+    ''' Create 3 arena shaped arrays for state information to merge into state vector with field information:
         [Agent present: -1 for enemy, 0 for none, 1 for self;
          Coin or crate present: -1 for crate, 0 for none, 1 for coin;
          bomb or explosion present: 5 for none, t for timer]
@@ -20,14 +20,13 @@ def create_state_vector(self):
     #bomb_state = np.zeros((arena.shape))
     x, y, _, bombs_left = self.game_state['self']
     bombs = self.game_state['bombs']
-    bomb_xys = [(x,y) for (x,y,t) in bombs]
     others = [(x,y) for (x,y,n,b) in self.game_state['others']]
     coins = self.game_state['coins']
     step = self.game_state['step']
     explosions = self.game_state['explosions']
-
                 
-    extras = np.zeros((1))
+    # May need to be extended dependent on the changes in state definition
+    extras = np.zeros((2))
     
     # For every cell: 
 
@@ -80,16 +79,10 @@ def create_state_vector(self):
                       axis=-1).flatten()
     
     vector = np.concatenate((extras, state)) # combine extras and state vector
-    # print(state[0:17], state[state%17==0])
-    # print(vector)
-    #print(3*np.add(walls[18,0]*offset, walls[18,1]))
-    
-    print(state.shape, vector.shape, 17*17*3, 176*3)
  
     
-    # Confirmed: vector has the right shape
-    # Not confirmed: vector has right content
-    
+    # Confirmed: vector has the right shape and content
+    # CHANGED KT-26.02/27.02
     # return final state vector
     return vector
     

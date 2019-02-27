@@ -94,10 +94,10 @@ class AgentProcess(mp.Process):
                     self.wlogger.debug(f'Received event queue {self.fake_self.events}')
                     self.wlogger.info('Process intermediate rewards')
                     try:
+                        # CHANGED KT-25.02
+                        # Update reward for last step
                         self.code.reward_update(self.fake_self)
-                        
-                        # print reward for last step
-                        # print(self.fake_self.rewards[-1])
+                        # CHANGED KT-25.02
                     except Exception as e:
                         self.wlogger.exception(f'Error in callback function: {e}')
                     self.wlogger.debug('Set flag to indicate readiness')
