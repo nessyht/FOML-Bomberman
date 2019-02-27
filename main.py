@@ -1,7 +1,6 @@
 
 from time import time, sleep
 import contextlib
-from time import time
 
 with contextlib.redirect_stdout(None):
     import pygame
@@ -45,6 +44,7 @@ def main():
             ('simple_agent', False),
             ('simple_agent', False),
             ('simple_agent', False)
+
         ])
     # world = ReplayWorld('Replay 2019-01-30 16:57:42')
     user_inputs = []

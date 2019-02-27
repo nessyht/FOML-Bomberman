@@ -4,7 +4,7 @@ from random import shuffle
 from time import time, sleep
 from collections import deque
 
-from settings import s
+from settings import s, e
 
 import pickle # store objects on disk
 
@@ -219,8 +219,23 @@ def reward_update(self):
     agent based on these events and your knowledge of the (new) game state. In
     contrast to act, this method has no time limit.
     """
+    
     self.logger.debug(f'Encountered {len(self.events)} game event(s)')
+    
+    # what to do when interrupted or when round survived?
+    reward = 0
+    for event in self.events:
 
+        if event == e.INVALID_ACTION:
+            reward = reward - 0.1
+        elif event == e.CRATE_DESTROYED:
+            reward = reward + 0.01            
+        elif event == e.COIN_COLLECTED:
+            reward = reward + 0.1
+        elif event == e.KILLED_OPPONENT:
+            reward == reward + 0.5
+    
+    self.rewards.append(reward)
 
 def end_of_episode(self):
     """Called at the end of each game to hand out final rewards and do training.
@@ -230,4 +245,24 @@ def end_of_episode(self):
     final step. You should place your actual learning code in this method.
     """
     self.logger.debug(f'Encountered {len(self.events)} game event(s) in final step')
+
+    
+    reward = 0
+    for event in self.events:
+        
+        if event == e.GOT_KILLED:
+            reward = reward - 0.5
+        elif event == e.KILLED_SELF:
+            reward = reward - 0.4
+        if event == e.INVALID_ACTION:
+            reward = reward - 0.1
+        elif event == e.CRATE_DESTROYED:
+            reward = reward + 0.01            
+        elif event == e.COIN_COLLECTED:
+            reward = reward + 0.1
+        elif event == e.KILLED_OPPONENT:
+            reward == reward + 0.5
+    
+    self.rewards.append(reward)
+
     
