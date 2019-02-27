@@ -8,7 +8,7 @@ import logging
 import pygame
 from pygame.locals import *
 from pygame.transform import smoothscale
-
+import numpy as np
 from items import *
 from settings import s, e
 
@@ -33,6 +33,22 @@ class AgentProcess(mp.Process):
         self.ready_flag = ready_flag
         self.agent_dir = agent_dir
         self.train_flag = train_flag
+        
+        # CHANGED
+        # Add variable which stores state vectors of respective round
+        
+        self.state_vectors = np.empty((2, 17 * 17 * 5 + 6))
+        
+        # 17x17x5 + 6 is the presumed length of the state vectors
+        # 17x17 cells; 5 entries for each cell; + 6 single entries
+        # should be adjusted as soon as the exact number of entries is known
+        
+        # This is necessary because it makes using np.concatenate much easier
+        
+        # Add list which stores all chosen actions
+        self.actions = []
+        
+        # END OF CHANGED
 
     def run(self):
         # Persistent 'self' object to pass to callback methods
@@ -104,25 +120,33 @@ class AgentProcess(mp.Process):
                 self.fake_self.next_action = 'WAIT'
                 t = time()
                 try:
+                    # Choose next action
                     self.code.act(self.fake_self)
-        
+                    
+                    # CHANGED: 
+                    # No timeout while in training mode
+                    
+                    # Creation of state vector
+                    
+                    # Check whether creation of state vector works
+                    if self.fake_self.game_state['step'] == 10: # delete this condition later
+                        if self.train_flag.is_set():
+                            
+                            # store state vector
+                            self.state_vectors = np.concatenate((self.state_vectors, create_state_vector(self.fake_self)))
+                            self.wlogger.info(f'State vector added by agent.')
+                            
+                            # store chosen action
+                            self.actions.append(self.next_action)
+                            self.wlogger.info('Stored next action.')
+                    
+                    # END OF CHANGED
+                
                 except KeyboardInterrupt:
                     self.wlogger.warn(f'Got interrupted by timeout')
                 except Exception as e:
                     self.wlogger.exception(f'Error in callback function: {e}')
                  
-                # CHANGED: 
-                # I guess this is the place where we don't get interrupted by timeout anymore
-                
-                # Creation of state vector
-                
-                # Check whether creation of state vector works
-                if self.fake_self.game_state['step'] == 10:
-                    if self.train_flag.is_set():                
-                        state_vector = create_state_vector(self.fake_self)
-                        self.wlogger.info(f'State vector has length {state_vector.shape[0]}.')
-                    
-                # TODO: store_next_action()
                 
                 
                 # Send action and time taken back to main process
