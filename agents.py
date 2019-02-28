@@ -12,7 +12,7 @@ import numpy as np
 from items import *
 from settings import s, e
 
-from functions import create_state_vector, store_next_action
+from functions import create_state_vector
 
 class IgnoreKeyboardInterrupt(object):
     """Context manager that protects enclosed code from Interrupt signals."""
@@ -34,7 +34,7 @@ class AgentProcess(mp.Process):
         self.agent_dir = agent_dir
         self.train_flag = train_flag
         
-        # CHANGED
+        # CHANGED HES
         # Add variable which stores state vectors of respective round
         
         self.state_vectors = np.empty((2, 17 * 17 * 5 + 6))
@@ -48,7 +48,9 @@ class AgentProcess(mp.Process):
         # Add list which stores all chosen actions
         self.actions = []
         
-        # END OF CHANGED
+        # Add list which stores all rewards
+        self.rewards = []
+        # END OF CHANGED HES
 
     def run(self):
         # Persistent 'self' object to pass to callback methods
@@ -127,7 +129,7 @@ class AgentProcess(mp.Process):
                     # Choose next action
                     self.code.act(self.fake_self)
                     
-                    # CHANGED: 
+                    # CHANGED HES: 
                     # No timeout while in training mode
                     
                     # Creation of state vector
@@ -144,7 +146,7 @@ class AgentProcess(mp.Process):
                             self.actions.append(self.next_action)
                             self.wlogger.info('Stored next action.')
                     
-                    # END OF CHANGED
+                    # END OF CHANGED HES
                 
                 except KeyboardInterrupt:
                     self.wlogger.warn(f'Got interrupted by timeout')
@@ -172,6 +174,10 @@ class AgentProcess(mp.Process):
                 self.wlogger.debug(f'Received final event queue {self.fake_self.events}')
                 try:
                     self.code.end_of_episode(self.fake_self)
+                    # CHANGED HES
+                    # Add rewards to agent process                    
+                    self.rewards = self.fake_self.rewards                 
+                    # END OF CHANGED HES
                 except Exception as e:
                     self.wlogger.exception(f'Error in callback function: {e}')
                 self.ready_flag.set()

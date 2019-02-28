@@ -1,4 +1,6 @@
 import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+import pickle
 
 def create_state_vector(self):
     """
@@ -87,11 +89,66 @@ def create_state_vector(self):
     # return final state vector
     return vector
     
-def store_next_action(self):
+def training(states, actions, rewards):
     """
-    This function is called in agents.py after act(self) was called.
-    This function stores/returns the action chosen by act(self).
-    The chosen action is stored in self.next_action
+    states: a flattened numpy array representing the occurred states
+    actions: a list of actions performed after respective state occurred
+    rewards: a list of rewards received after respective action was performed
     """
     
-    return self.next_action
+    # Check whether all arguments have the same number of entries
+    n = states.shape[0]
+    if len(actions) != n or len(rewards) != n:
+        print('ERROR in training(): No matching number of states, rewards, actions.')
+        print('Number of entries:')
+        print('states:', n)
+        print('actions:', len(actions))
+        print('rewards:', len(rewards))
+        return # stop training
+    
+    # Initialize Regressors
+    up = RandomForestRegressor()
+    down = RandomForestRegressor()
+    left = RandomForestRegressor()
+    right = RandomForestRegressor()
+    wait = RandomForestRegressor()
+    bomb = RandomForestRegressor()
+    
+    print('Start fitting models.')
+    print('Fitting UP.')
+    up.fit(states[actions=='UP'], rewards[actions=='UP'])
+    
+    print('Fitting DOWN.')
+    down.fit(states[actions=='DOWN'], rewards[actions=='DOWN'])
+    
+    print('Fitting LEFT.')
+    left.fit(states[actions=='LEFT'], rewards[actions=='LEFT'])
+    
+    print('Fitting RIGHT.')
+    right.fit(states[actions=='RIGHT'], rewards[actions=='RIGHT'])
+    
+    print('Fitting WAIT.')
+    wait.fit(states[actions=='WAIT'], rewards[actions=='WAIT'])
+    
+    print('Fitting BOMB.')
+    bomb.fit(states[actions=='BOMB'], rewards[actions=='BOMB'])
+    
+    print('Finished fitting.')
+    
+    print('Store regressors')
+    pickle.dump(up, open('up.txt', 'wb'))
+    pickle.dump(down, open('down.txt', 'wb'))
+    pickle.dump(left, open('left.txt', 'wb'))
+    pickle.dump(right, open('right.txt', 'wb'))
+    pickle.dump(wait, open('wait.txt', 'wb'))
+    pickle.dump(bomb, open('bomb.txt', 'wb'))
+    print('Regressors stored.')
+    
+def choose_action(regressor_list, state, exploring=False):
+    """
+    regressor_list: list of regressors in order: up,down,left,right,wait,bomb
+    state: the state for which to find the best action
+    exploring: whether agent should explore different actions
+    """
+    
+    
