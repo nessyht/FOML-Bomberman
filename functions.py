@@ -143,12 +143,51 @@ def training(states, actions, rewards):
     pickle.dump(wait, open('wait.txt', 'wb'))
     pickle.dump(bomb, open('bomb.txt', 'wb'))
     print('Regressors stored.')
+
+def MB_probs(awards, T=100):
+    """
+    returns probabilities for exploring based on a Max-Boltzman-distribution
+    """
+    Q = np.array(awards)
+    denom = np.sum(np.exp(np.divide(Q,T)))
+    return np.divide(np.exp(np.divide(Q,T)),denom)
     
-def choose_action(regressor_list, state, exploring=False):
+def choose_action(regressor_list, state, exploring=False, epsilon=0.3):
     """
     regressor_list: list of regressors in order: up,down,left,right,wait,bomb
     state: the state for which to find the best action
     exploring: whether agent should explore different actions
+    epsilon: probability with which we will explore
     """
     
+    # list of actions in the same order as corresponding actions in regressor_list
+    actions = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB]
+    
+    predicted_reward = []
+    
+    # predict expected reward for each action
+    for reg in regressor_list:
+        predicted_reward.append(reg.predict(state))
+    
+    exploit = np.argmax(predicted_reward) # Index of action with highest reward
+    
+    if not exploring:
+        # Choose action with highest expected reward
+        return actions[exploit]
+    
+    # Will we explore?
+    explore = np.random.choice([True, False], p=[epsilon, 1-epsilon])
+    
+    if not explore:
+        # Choose action with highest expected reward
+        return actions[exploit]
+    
+    if explore:
+        # Remove highest reward from selection
+        actions.pop([exploit])
+        predicted_reward.pop([exploit])
+        
+        probabilities = MB_probs(predicted_reward, T=100)
+        
+        return np.random.choice(actions, p=probabilities)
     
