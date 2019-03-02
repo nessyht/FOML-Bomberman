@@ -136,7 +136,7 @@ class AgentProcess(mp.Process):
                     # Creation of state vector
                     
                     # Check whether creation of state vector works
-                    if self.fake_self.game_state['step'] == 10: # delete this condition later
+                    if self.fake_self.game_state['step'] == 30: # delete this condition later
                         if self.train_flag.is_set():
                             
                             # store state vector
