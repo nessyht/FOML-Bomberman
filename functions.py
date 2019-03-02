@@ -1,7 +1,9 @@
+
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neural_network import MLPRegressor
 import pickle
+
 
 def create_state_vector(self):
     """
@@ -9,14 +11,15 @@ def create_state_vector(self):
     This function stores/returns the current state of the game in a numpy array.
     The current state of the game is stored in 'self'.
     """
-    # CHANGED KT-26.02/27-02
+    # CHANGED KT
     # Import available data
     arena = self.game_state['arena'].copy()    
     
-    ''' Create 3 arena shaped arrays for state information to merge into state vector with field information:
-        [Agent present: -1 for enemy, 0 for none, 1 for self;
-         Coin or crate present: -1 for crate, 0 for none, 1 for coin;
-         bomb or explosion present: 5 for none, t for timer]
+    ''' 
+    Create 3 arena shaped arrays for state information to merge into state vector with field information:
+    [Agent present: -1 for enemy, 0 for none, 1 for self;
+     Coin or crate present: -1 for crate, 0 for none, 1 for coin;
+     bomb or explosion present: 5 for none, t for timer]
     '''
     agent_state = np.zeros((arena.shape))
     #loot_state = np.zeros((arena.shape))
@@ -30,7 +33,7 @@ def create_state_vector(self):
     explosions = self.game_state['explosions']
                 
     # May need to be extended dependent on the changes in state definition
-    extras = np.zeros((2))
+    extras = np.zeros((4))
     
     # For every cell: 
 
@@ -49,28 +52,33 @@ def create_state_vector(self):
         loot_state[coin[0], coin[1]] = 1
     
     # Bomb radius on cell?    
-    bomb_state = np.ones(arena.shape) * 5
+    bomb_state = np.ones(arena.shape) * 7
+    
     for xb,yb,t in bombs:
         for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
             if (0 < i < bomb_state.shape[0]) and (0 < j < bomb_state.shape[1]):
                 bomb_state[i,j] = min(bomb_state[i,j], t)
+                
+    # Exlosions on cell?
+    for explosion in explosions:
+        for i, j in explosion.blast_coords:
+            bomb_state[i,j] = min(bomb_state[i,j], explosion.timer)
     
-    # Explosion on cell? Important?
-    
-
     # Only once:
     # Current step
-    
+    extras[0] = step
     # Danger level
-    extras[0] = 5 - bomb_state[x, y]
+    extras[1] = 7 - bomb_state[x, y]
     
     # Bomb action possible?
+    extras[2] = bombs_left
     
-    # Reward for step
-    # extras[1] = self.rewards[-1]
+    # Touching enemy
+    if len(others) > 0:
+        if (min(abs(xy[0] - x) + abs(xy[1] - y) for xy in others)) <= 1:
+            extras[3] = 1
     
-    # Step number
-    
+    # Reward for step (later)
     
     # Reward for episode (added later)
     
@@ -83,13 +91,15 @@ def create_state_vector(self):
                       axis=-1).flatten()
     
     vector = np.concatenate((extras, state)) # combine extras and state vector
- 
+    print(bomb_state)
+    print(vector.shape)
     
     # Confirmed: vector has the right shape and content
-    # CHANGED KT-26.02/27.02
+    # END OF CHANGED KT
     # return final state vector
     return vector
     
+
 def training(states, actions, rewards):
     """
     states: a flattened numpy array representing the occurred states

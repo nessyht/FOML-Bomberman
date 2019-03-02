@@ -11,6 +11,7 @@ import threading
 
 from environment import BombeRLeWorld, ReplayWorld
 from settings import s
+from functions import create_initial_train_data
 
 
 # Function to run the game logic in a separate thread
@@ -125,11 +126,9 @@ def main():
     actions = world.actions # All actions chosen after respective state occurred
     rewards = world.rewards # All cummulated rewards received after respective state occurred
     
-    # END OF CHANGED
-    
     world.end()
-
-
+    
+    # END OF CHANGED
 
 
 if __name__ == '__main__':

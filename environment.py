@@ -31,11 +31,11 @@ class BombeRLeWorld(object):
         # CHANGED HES:
         # Add variables which collect training data; Will later be accessed by main.py:
         
-        self.states = np.empty((2, 17 * 17 * 5 + 6))  # All states occurred during the season
+        self.states = np.empty((2, 528 + 6))  # All states occurred during the season
         self.actions = [] # All actions chosen after respective state occurred
         self.rewards = [] # All cummulated rewards received after respective state occurred
         
-        self.current_round_states = np.empty((2, 17 * 17 * 5 + 6))
+        self.current_round_states = np.empty((2, 528 + 6))
         self.current_round_actions = []
         self.current_round_rewards = []        
         
@@ -96,10 +96,11 @@ class BombeRLeWorld(object):
 
 
     def new_round(self):
-        
-        # CHANGED HES:
-        # clear current round states, actions and rewards
-        self.current_round_states = np.empty((2, 17 * 17 * 5 + 6))
+
+        # CHANGED:
+        # clear current round states and actions
+        self.current_round_states = np.empty((2, 528 + 6))
+
         self.current_round_actions = []
         self.current_round_rewards = []
         

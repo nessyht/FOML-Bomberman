@@ -223,21 +223,21 @@ def reward_update(self):
     self.logger.debug(f'Encountered {len(self.events)} game event(s)')
     
     # what to do when interrupted or when round survived?
-    # CHANGED KT-25.02
+    # CHANGED KT
     reward = 0
     for event in self.events:
 
         if event == e.INVALID_ACTION:
             reward = reward - 0.1
-        elif event == e.CRATE_DESTROYED:
+        if event == e.CRATE_DESTROYED:
             reward = reward + 0.01            
-        elif event == e.COIN_COLLECTED:
+        if event == e.COIN_COLLECTED:
             reward = reward + 0.1
-        elif event == e.KILLED_OPPONENT:
+        if event == e.KILLED_OPPONENT:
             reward == reward + 0.5
     
     self.rewards.append(reward)
-    # CHANGED KT-25.02
+    # CHANGED KT
 def end_of_episode(self):
     """Called at the end of each game to hand out final rewards and do training.
 
@@ -247,23 +247,23 @@ def end_of_episode(self):
     """
     self.logger.debug(f'Encountered {len(self.events)} game event(s) in final step')
 
-    # CHANGED KT-25.02
+    # CHANGED KT
     reward = 0
     for event in self.events:
         
         if event == e.GOT_KILLED:
             reward = reward - 0.5
-        elif event == e.KILLED_SELF:
+        if event == e.KILLED_SELF:
             reward = reward - 0.4
         if event == e.INVALID_ACTION:
             reward = reward - 0.1
-        elif event == e.CRATE_DESTROYED:
+        if event == e.CRATE_DESTROYED:
             reward = reward + 0.01            
-        elif event == e.COIN_COLLECTED:
+        if event == e.COIN_COLLECTED:
             reward = reward + 0.1
-        elif event == e.KILLED_OPPONENT:
+        if event == e.KILLED_OPPONENT:
             reward == reward + 0.5
     
     self.rewards.append(reward)
-    # CHANGED KT-25.02
+    # CHANGED KT
     
