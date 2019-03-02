@@ -11,7 +11,6 @@ import threading
 
 from environment import BombeRLeWorld, ReplayWorld
 from settings import s
-from functions import create_initial_train_data
 
 
 # Function to run the game logic in a separate thread
