@@ -12,7 +12,7 @@ import numpy as np
 from items import *
 from settings import s, e
 
-from functions import create_state_vector, store_next_action
+from functions import create_state_vector
 
 class IgnoreKeyboardInterrupt(object):
     """Context manager that protects enclosed code from Interrupt signals."""
@@ -37,10 +37,10 @@ class AgentProcess(mp.Process):
         # CHANGED
         # Add variable which stores state vectors of respective round
         
-        self.state_vectors = np.empty((2, 17 * 17 * 5 + 6))
+        self.state_vectors = np.empty((2, 528 + 6))
         
         # 17x17x5 + 6 is the presumed length of the state vectors
-        # 17x17 cells; 5 entries for each cell; + 6 single entries
+        # 17x17 cells, 7x7 walls; 3 entries for each cell; + 6 single entries
         # should be adjusted as soon as the exact number of entries is known
         
         # This is necessary because it makes using np.concatenate much easier
@@ -91,6 +91,7 @@ class AgentProcess(mp.Process):
                 break
             self.wlogger.info(f'STARTING ROUND #{self.round}')
             self.fake_self.rewards = []
+            self.fake_self.state_vectors = []
 
             # Take steps until exit message for current round is received
             while True:
@@ -110,10 +111,10 @@ class AgentProcess(mp.Process):
                     self.wlogger.debug(f'Received event queue {self.fake_self.events}')
                     self.wlogger.info('Process intermediate rewards')
                     try:
-                        # CHANGED KT-25.02
+                        # CHANGED KT
                         # Update reward for last step
                         self.code.reward_update(self.fake_self)
-                        # CHANGED KT-25.02
+                        # CHANGED KT
                     except Exception as e:
                         self.wlogger.exception(f'Error in callback function: {e}')
                     self.wlogger.debug('Set flag to indicate readiness')
@@ -137,7 +138,11 @@ class AgentProcess(mp.Process):
                         if self.train_flag.is_set():
                             
                             # store state vector
-                            self.state_vectors = np.concatenate((self.state_vectors, create_state_vector(self.fake_self)))
+                            # self.state_vectors = np.concatenate((self.state_vectors, create_state_vector(self.fake_self)))
+                            # CHANGED 2
+                            self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, create_state_vector(self.fake_self)))
+                            print(self.fake_self.state_vectors)
+                            # END CHANGED 2
                             self.wlogger.info(f'State vector added by agent.')
                             
                             # store chosen action
@@ -172,6 +177,16 @@ class AgentProcess(mp.Process):
                 self.wlogger.debug(f'Received final event queue {self.fake_self.events}')
                 try:
                     self.code.end_of_episode(self.fake_self)
+                    # CHANGED KT - could be moved into end_of_episode code may be more elegant
+                    # Add rewards for each step to states
+                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, self.fake_self.rewards.T), axis = 1)
+                    
+                    # Add rewards for each episode to states
+                    total_rewards = np.ones((self.fake_self.rewards.shape[0]))*np.sum(self.fake_self.rewards)
+                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, total_rewards.T), axis = 1)
+                    self.state_vectors = self.fake_self.state_vectors
+                    # END OF CHANGED
+                    
                 except Exception as e:
                     self.wlogger.exception(f'Error in callback function: {e}')
                 self.ready_flag.set()
