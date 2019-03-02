@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.neural_network import MLPRegressor
 import pickle
 
 def create_state_vector(self):
@@ -106,49 +107,25 @@ def training(states, actions, rewards):
         print('rewards:', len(rewards))
         return # stop training
     
-    # Initialize Regressors
-    up = RandomForestRegressor()
-    down = RandomForestRegressor()
-    left = RandomForestRegressor()
-    right = RandomForestRegressor()
-    wait = RandomForestRegressor()
-    bomb = RandomForestRegressor()
+    moves = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
     
-    print('Start fitting models.')
-    print('Fitting UP.')
-    up.fit(states[actions=='UP'], rewards[actions=='UP'])
-    
-    print('Fitting DOWN.')
-    down.fit(states[actions=='DOWN'], rewards[actions=='DOWN'])
-    
-    print('Fitting LEFT.')
-    left.fit(states[actions=='LEFT'], rewards[actions=='LEFT'])
-    
-    print('Fitting RIGHT.')
-    right.fit(states[actions=='RIGHT'], rewards[actions=='RIGHT'])
-    
-    print('Fitting WAIT.')
-    wait.fit(states[actions=='WAIT'], rewards[actions=='WAIT'])
-    
-    print('Fitting BOMB.')
-    bomb.fit(states[actions=='BOMB'], rewards[actions=='BOMB'])
-    
-    print('Finished fitting.')
-    
-    print('Store regressors')
-    pickle.dump(up, open('up.txt', 'wb'))
-    pickle.dump(down, open('down.txt', 'wb'))
-    pickle.dump(left, open('left.txt', 'wb'))
-    pickle.dump(right, open('right.txt', 'wb'))
-    pickle.dump(wait, open('wait.txt', 'wb'))
-    pickle.dump(bomb, open('bomb.txt', 'wb'))
+    for move in moves:        
+        regressor = RandomForestRegressor() # Initialize Random Forest Regressor  
+        #regressor = MLPRegressor(max_iter=500) # Initialize MLP Regressor (Neural Network)
+        
+        print('Fitting ', move,'.') # Inform user about progress
+        # Fit regressor on respective states/rewards
+        regressor.fit(states[actions==move], rewards[actions==move])
+        pickle.dump(regressor, open(move + '.txt', 'wb')) # Store regressor in file e.g. 'UP.txt'
+        
     print('Regressors stored.')
 
-def MB_probs(awards, T=100):
+def MB_probs(rewards, T=100):
     """
     returns probabilities for exploring based on a Max-Boltzman-distribution
+    rewards: array/list with expected rewards
     """
-    Q = np.array(awards)
+    Q = np.array(rewards)
     denom = np.sum(np.exp(np.divide(Q,T)))
     return np.divide(np.exp(np.divide(Q,T)),denom)
     
@@ -161,7 +138,7 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.3):
     """
     
     # list of actions in the same order as corresponding actions in regressor_list
-    actions = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB]
+    actions = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
     
     predicted_reward = []
     
@@ -187,7 +164,8 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.3):
         actions.pop([exploit])
         predicted_reward.pop([exploit])
         
-        probabilities = MB_probs(predicted_reward, T=100)
+        mean_reward_size = np.mean(np.abs(predicted_reward))
+        probabilities = MB_probs(predicted_reward, T=mean_reward_size)
         
         return np.random.choice(actions, p=probabilities)
     
