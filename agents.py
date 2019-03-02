@@ -148,7 +148,7 @@ class AgentProcess(mp.Process):
                             self.wlogger.info(f'State vector added by agent.')
                             
                             # store chosen action
-                            self.actions.append(self.next_action)
+                            self.actions.append(self.fake_self.next_action)
                             self.wlogger.info('Stored next action.')
                     
                     # END OF CHANGED HES
@@ -182,11 +182,11 @@ class AgentProcess(mp.Process):
 
                     # CHANGED KT - could be moved into end_of_episode code may be more elegant
                     # Add rewards for each step to states
-                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, self.fake_self.rewards.T), axis = 1)
+                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(self.fake_self.rewards).T), axis = 1)
                     
                     # Add rewards for each episode to states
                     total_rewards = np.ones((self.fake_self.rewards.shape[0]))*np.sum(self.fake_self.rewards)
-                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, total_rewards.T), axis = 1)
+                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(total_rewards).T), axis = 1)
                     self.state_vectors = self.fake_self.state_vectors
                     # END OF CHANGED
                     # CHANGED HES

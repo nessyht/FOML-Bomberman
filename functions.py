@@ -26,12 +26,12 @@ def create_state_vector(self):
     #bomb_state = np.zeros((arena.shape))
 
     x, y, _, bombs_left = self.game_state['self']
-    bombs = self.game_state['bombs']
+    bombs = self.game_state['bombs'].copy()
     others = [(x,y) for (x,y,n,b) in self.game_state['others']]
     coins = self.game_state['coins']
     step = self.game_state['step']
-    explosions = self.game_state['explosions']
-                
+    explosions = self.game_state['explosions'].copy()
+    
     # May need to be extended dependent on the changes in state definition
     extras = np.zeros((4))
     
@@ -52,24 +52,25 @@ def create_state_vector(self):
         loot_state[coin[0], coin[1]] = 1
     
     # Bomb radius on cell?    
-    bomb_state = np.ones(arena.shape) * 7
+    bomb_state = np.ones(arena.shape) * 6
     
     for xb,yb,t in bombs:
         for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
             if (0 < i < bomb_state.shape[0]) and (0 < j < bomb_state.shape[1]):
                 bomb_state[i,j] = min(bomb_state[i,j], t)
-                
+    # Danger level
+    extras[1] = 6 - bomb_state[x, y]
+                    
     # Exlosions on cell?
-    for explosion in explosions:
-        for i, j in explosion.blast_coords:
-            bomb_state[i,j] = min(bomb_state[i,j], explosion.timer)
-    
+      
+    bomb_state[np.where(explosions == 1)] = 0
+    bomb_state[np.where(explosions == 2)] = 1
+
     # Only once:
     # Current step
     extras[0] = step
-    # Danger level
-    extras[1] = 7 - bomb_state[x, y]
     
+
     # Bomb action possible?
     extras[2] = bombs_left
     
@@ -82,7 +83,6 @@ def create_state_vector(self):
     
     # Reward for episode (added later)
     
-    
     # State of each cell
     # combine state maps and flatten into 1D-array
     state = np.stack((agent_state[arena != -1].flatten(), \
@@ -90,8 +90,7 @@ def create_state_vector(self):
                       bomb_state[arena != -1].flatten()), \
                       axis=-1).flatten()
     
-    vector = np.concatenate((extras, state)) # combine extras and state vector
-    print(bomb_state)
+    vector = np.concatenate((state, extras)) # combine extras and state vector
     print(vector.shape)
     
     # Confirmed: vector has the right shape and content
