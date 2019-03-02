@@ -34,12 +34,12 @@ class AgentProcess(mp.Process):
         self.agent_dir = agent_dir
         self.train_flag = train_flag
         
-        # CHANGED
+        # CHANGED HES
         # Add variable which stores state vectors of respective round
         
         self.state_vectors = np.empty((2, 528 + 6))
         
-        # 17x17x5 + 6 is the presumed length of the state vectors
+        # x17x5 + 6 is the presumed length of the state vectors
         # 17x17 cells, 7x7 walls; 3 entries for each cell; + 6 single entries
         # should be adjusted as soon as the exact number of entries is known
         
@@ -48,7 +48,9 @@ class AgentProcess(mp.Process):
         # Add list which stores all chosen actions
         self.actions = []
         
-        # END OF CHANGED
+        # Add list which stores all rewards
+        self.rewards = []
+        # END OF CHANGED HES
 
     def run(self):
         # Persistent 'self' object to pass to callback methods
@@ -128,7 +130,7 @@ class AgentProcess(mp.Process):
                     # Choose next action
                     self.code.act(self.fake_self)
                     
-                    # CHANGED: 
+                    # CHANGED HES: 
                     # No timeout while in training mode
                     
                     # Creation of state vector
@@ -149,7 +151,7 @@ class AgentProcess(mp.Process):
                             self.actions.append(self.next_action)
                             self.wlogger.info('Stored next action.')
                     
-                    # END OF CHANGED
+                    # END OF CHANGED HES
                 
                 except KeyboardInterrupt:
                     self.wlogger.warn(f'Got interrupted by timeout')
@@ -177,6 +179,7 @@ class AgentProcess(mp.Process):
                 self.wlogger.debug(f'Received final event queue {self.fake_self.events}')
                 try:
                     self.code.end_of_episode(self.fake_self)
+
                     # CHANGED KT - could be moved into end_of_episode code may be more elegant
                     # Add rewards for each step to states
                     self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, self.fake_self.rewards.T), axis = 1)
@@ -186,7 +189,11 @@ class AgentProcess(mp.Process):
                     self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, total_rewards.T), axis = 1)
                     self.state_vectors = self.fake_self.state_vectors
                     # END OF CHANGED
-                    
+                    # CHANGED HES
+                    # Add rewards to agent process                    
+                    self.rewards = self.fake_self.rewards                 
+                    # END OF CHANGED HES
+                                  
                 except Exception as e:
                     self.wlogger.exception(f'Error in callback function: {e}')
                 self.ready_flag.set()

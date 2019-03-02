@@ -1,6 +1,9 @@
-import pickle
+
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.neural_network import MLPRegressor
+import pickle
+
 
 def create_state_vector(self):
     """
@@ -96,29 +99,83 @@ def create_state_vector(self):
     # return final state vector
     return vector
     
-def create_initial_train_data(states, actions, rewards):
-    
-    # Initialise the random forest regressors
-    up = RandomForestRegressor()
-    down = RandomForestRegressor()
-    left = RandomForestRegressor()
-    right = RandomForestRegressor()
-    wait = RandomForestRegressor()
-    bomb = RandomForestRegressor()
-    
-    # Fit regressors with the states and rewards recieved for the appropriate actions
-    bomb.fit(states[actions=='BOMB'], rewards[actions=='BOMB'])
-    up.fit(states[actions=='UP'], rewards[actions=='UP'])
-    left.fit(states[actions=='LEFT'], rewards[actions=='LEFT'])
-    down.fit(states[actions=='DOWN'], rewards[actions=='DOWN'])
-    right.fit(states[actions=='RIGHT'], rewards[actions=='RIGHT'])
-    wait.fit(states[actions=='WAIT'], rewards[actions=='WAIT'])
 
-    # Store regressors in appropriately named .txt files using pickle
-    pickle.dump(bomb, open('bomb.txt', 'wb'))    
-    pickle.dump(up, open('up.txt', 'wb'))
-    pickle.dump(left, open('left.txt', 'wb'))
-    pickle.dump(down, open('down.txt', 'wb'))
-    pickle.dump(right, open('right.txt', 'wb'))
-    pickle.dump(wait, open('wait.txt', 'wb'))
+def training(states, actions, rewards):
+    """
+    states: a flattened numpy array representing the occurred states
+    actions: a list of actions performed after respective state occurred
+    rewards: a list of rewards received after respective action was performed
+    """
+    
+    # Check whether all arguments have the same number of entries
+    n = states.shape[0]
+    if len(actions) != n or len(rewards) != n:
+        print('ERROR in training(): No matching number of states, rewards, actions.')
+        print('Number of entries:')
+        print('states:', n)
+        print('actions:', len(actions))
+        print('rewards:', len(rewards))
+        return # stop training
+    
+    moves = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
+    
+    for move in moves:        
+        regressor = RandomForestRegressor() # Initialize Random Forest Regressor  
+        #regressor = MLPRegressor(max_iter=500) # Initialize MLP Regressor (Neural Network)
+        
+        print('Fitting ', move,'.') # Inform user about progress
+        # Fit regressor on respective states/rewards
+        regressor.fit(states[actions==move], rewards[actions==move])
+        pickle.dump(regressor, open(move + '.txt', 'wb')) # Store regressor in file e.g. 'UP.txt'
+        
+    print('Regressors stored.')
+
+def MB_probs(rewards, T=100):
+    """
+    returns probabilities for exploring based on a Max-Boltzman-distribution
+    rewards: array/list with expected rewards
+    """
+    Q = np.array(rewards)
+    denom = np.sum(np.exp(np.divide(Q,T)))
+    return np.divide(np.exp(np.divide(Q,T)),denom)
+    
+def choose_action(regressor_list, state, exploring=False, epsilon=0.3):
+    """
+    regressor_list: list of regressors in order: up,down,left,right,wait,bomb
+    state: the state for which to find the best action
+    exploring: whether agent should explore different actions
+    epsilon: probability with which we will explore
+    """
+    
+    # list of actions in the same order as corresponding actions in regressor_list
+    actions = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
+    
+    predicted_reward = []
+    
+    # predict expected reward for each action
+    for reg in regressor_list:
+        predicted_reward.append(reg.predict(state))
+    
+    exploit = np.argmax(predicted_reward) # Index of action with highest reward
+    
+    if not exploring:
+        # Choose action with highest expected reward
+        return actions[exploit]
+    
+    # Will we explore?
+    explore = np.random.choice([True, False], p=[epsilon, 1-epsilon])
+    
+    if not explore:
+        # Choose action with highest expected reward
+        return actions[exploit]
+    
+    if explore:
+        # Remove highest reward from selection
+        actions.pop([exploit])
+        predicted_reward.pop([exploit])
+        
+        mean_reward_size = np.mean(np.abs(predicted_reward))
+        probabilities = MB_probs(predicted_reward, T=mean_reward_size)
+        
+        return np.random.choice(actions, p=probabilities)
     
