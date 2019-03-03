@@ -36,7 +36,7 @@ class AgentProcess(mp.Process):
         
         # CHANGED HES
         # Add variable which stores state vectors of respective round
-        
+        print('Self state vector reset.')
         self.state_vectors = np.empty((2, 528 + 4))
         
         # 528 + 6 is the number of entries in the state vector
@@ -94,6 +94,7 @@ class AgentProcess(mp.Process):
             # CHANGED
             # Reset at beginning of each round
             self.fake_self.rewards = []
+            print('Fake_self state vector reset.')
             self.fake_self.state_vectors = np.empty((2, 528 + 4)) # automatically turned into np.array later (using = np.concatenate(...))
             self.fake_self.actions = []
             # END OF CHANGED
@@ -205,10 +206,13 @@ class AgentProcess(mp.Process):
                     total_rewards = np.ones((len(self.fake_self.rewards)))*np.sum(self.fake_self.rewards)
                     self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(total_rewards).reshape((len(total_rewards),1))), axis = 1)
                     
+                    print('Pass data to self from fake_self:')
+                    print('State vector shape of fakeself:',self.fake_self.state_vectors.shape)
                     # This makes sure that e.g. self.rewards always contains only the data of a single round.
                     self.state_vectors = self.fake_self.state_vectors
                     self.rewards = self.fake_self.rewards
                     self.actions = self.fake_self.actions
+                    print('After passing:\nShape of state vectors:',self.state_vectors.shape)
                     # END OF CHANGED HES
                                   
                 except Exception as e:
