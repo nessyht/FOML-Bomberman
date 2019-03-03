@@ -114,7 +114,7 @@ def main():
         
         world.states = np.concatenate((world.states, world.current_round_states[2:,:]))            
         world.actions.extend(world.current_round_actions)            
-        world.rewards.extend(world.current_round_rewards)
+        #world.rewards.extend(world.current_round_rewards)
         
         # END OF CHANGED
 
@@ -123,7 +123,11 @@ def main():
     
     states = world.states   # All states occurred during the season
     actions = world.actions # All actions chosen after respective state occurred
-    rewards = world.rewards # All cummulated rewards received after respective state occurred
+    #rewards = world.rewards # All cummulated rewards received after respective state occurred
+    
+    print(states.shape)
+    print(len(actions))
+    
     
     world.end()
     
