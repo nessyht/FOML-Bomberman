@@ -306,8 +306,12 @@ class BombeRLeWorld(object):
         # store training data
         
         if agent.train_flag.is_set():
+            print('Put down agent.')
+            print('Passing agent states to current round states.')
             self.current_round_states = np.concatenate((self.current_round_states, agent.process.state_vectors))
             self.current_round_actions.extend(agent.process.actions)
+            print('Shape of current round states:',self.current_round_states.shape)
+            print('Length of current round actions:',len(self.current_round_actions))
             #self.current_round_rewards.extend(agent.process.rewards)
             
             # Remark: Data needs to be extended/concatenated here so that different agents can add their data.
