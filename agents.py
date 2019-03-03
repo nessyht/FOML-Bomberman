@@ -92,8 +92,13 @@ class AgentProcess(mp.Process):
                 self.wlogger.info('Received global exit message')
                 break
             self.wlogger.info(f'STARTING ROUND #{self.round}')
+            
+            # CHANGED
+            # Reset at beginning of each round
             self.fake_self.rewards = []
-            self.fake_self.state_vectors = []
+            self.fake_self.state_vectors = [] # automatically turned into np.array later (using = np.concatenate(...))
+            self.fake_self.actions = []
+            # END OF CHANGED
 
             # Take steps until exit message for current round is received
             while True:
@@ -115,6 +120,7 @@ class AgentProcess(mp.Process):
                     try:
                         # CHANGED KT
                         # Update reward for last step
+                        # Rewards get appended on self.fake_self.rewards
                         self.code.reward_update(self.fake_self)
                         # CHANGED KT
                     except Exception as e:
@@ -148,7 +154,7 @@ class AgentProcess(mp.Process):
                             self.wlogger.info(f'State vector added by agent.')
                             
                             # store chosen action
-                            self.actions.append(self.fake_self.next_action)
+                            self.fake_self.actions.append(self.fake_self.next_action)
                             self.wlogger.info('Stored next action.')
                     
                     # END OF CHANGED HES
@@ -182,16 +188,21 @@ class AgentProcess(mp.Process):
 
                     # CHANGED KT - could be moved into end_of_episode code may be more elegant
                     # Add rewards for each step to states
-                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(self.fake_self.rewards).T), axis = 1)
+                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(self.fake_self.rewards).reshape((len(self.fake_self.rewards),1))), axis = 1)
+                    # Explanation for the line above:
+                    # Goal is to add rewards as an additional column to each state
+                    # Reshape so that states and rewards have the same number of dimensions, which is necessary for concatenate
+                    # axis = 1 so that rewards are added as new column, not new row
+                    
                     
                     # Add rewards for each episode to states
                     total_rewards = np.ones((self.fake_self.rewards.shape[0]))*np.sum(self.fake_self.rewards)
-                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(total_rewards).T), axis = 1)
+                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(total_rewards).reshape((len(total_rewards),1))), axis = 1)
+                    
+                    # This makes sure that e.g. self.rewards always contains the data of a single round.
                     self.state_vectors = self.fake_self.state_vectors
-                    # END OF CHANGED
-                    # CHANGED HES
-                    # Add rewards to agent process                    
-                    self.rewards = self.fake_self.rewards                 
+                    self.rewards = self.fake_self.rewards
+                    self.actions = self.fake_self.actions
                     # END OF CHANGED HES
                                   
                 except Exception as e:
