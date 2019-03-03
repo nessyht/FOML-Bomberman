@@ -228,13 +228,13 @@ def reward_update(self):
     for event in self.events:
 
         if event == e.INVALID_ACTION:
-            reward = reward - 0.1
+            reward = reward - 100
         if event == e.CRATE_DESTROYED:
-            reward = reward + 0.01            
+            reward = reward + 10            
         if event == e.COIN_COLLECTED:
-            reward = reward + 0.1
+            reward = reward + 100
         if event == e.KILLED_OPPONENT:
-            reward == reward + 0.5
+            reward == reward + 500
     
     self.rewards.append(reward)
     # CHANGED KT
@@ -252,17 +252,17 @@ def end_of_episode(self):
     for event in self.events:
         
         if event == e.GOT_KILLED:
-            reward = reward - 0.5
+            reward = reward - 500
         if event == e.KILLED_SELF:
-            reward = reward - 0.4
+            reward = reward - 400
         if event == e.INVALID_ACTION:
-            reward = reward - 0.1
+            reward = reward - 100
         if event == e.CRATE_DESTROYED:
-            reward = reward + 0.01            
+            reward = reward + 10            
         if event == e.COIN_COLLECTED:
-            reward = reward + 0.1
+            reward = reward + 100
         if event == e.KILLED_OPPONENT:
-            reward == reward + 0.5
+            reward == reward + 500
     
     self.rewards.append(reward)
     # CHANGED KT
