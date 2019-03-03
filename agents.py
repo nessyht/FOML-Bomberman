@@ -39,9 +39,7 @@ class AgentProcess(mp.Process):
         
         self.state_vectors = np.empty((2, 528 + 6))
         
-        # x17x5 + 6 is the presumed length of the state vectors
-        # 17x17 cells, 7x7 walls; 3 entries for each cell; + 6 single entries
-        # should be adjusted as soon as the exact number of entries is known
+        # 528 + 6 is the number of entries in the state vector
         
         # This is necessary because it makes using np.concatenate much easier
         
@@ -122,7 +120,7 @@ class AgentProcess(mp.Process):
                         # Update reward for last step
                         # Rewards get appended on self.fake_self.rewards
                         self.code.reward_update(self.fake_self)
-                        # CHANGED KT
+                        # END OF CHANGED KT
                     except Exception as e:
                         self.wlogger.exception(f'Error in callback function: {e}')
                     self.wlogger.debug('Set flag to indicate readiness')
@@ -142,7 +140,7 @@ class AgentProcess(mp.Process):
                     # Creation of state vector
                     
                     # Check whether creation of state vector works
-                    if self.fake_self.game_state['step'] == 30: # delete this condition later
+                    if self.fake_self.game_state['step'] == 30: # TODO: delete this condition later
                         if self.train_flag.is_set():
                             
                             # store state vector
@@ -187,6 +185,7 @@ class AgentProcess(mp.Process):
                     self.code.end_of_episode(self.fake_self)
 
                     # CHANGED KT - could be moved into end_of_episode code may be more elegant
+                    
                     # Add rewards for each step to states
                     self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(self.fake_self.rewards).reshape((len(self.fake_self.rewards),1))), axis = 1)
                     # Explanation for the line above:
@@ -199,7 +198,7 @@ class AgentProcess(mp.Process):
                     total_rewards = np.ones((self.fake_self.rewards.shape[0]))*np.sum(self.fake_self.rewards)
                     self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(total_rewards).reshape((len(total_rewards),1))), axis = 1)
                     
-                    # This makes sure that e.g. self.rewards always contains the data of a single round.
+                    # This makes sure that e.g. self.rewards always contains only the data of a single round.
                     self.state_vectors = self.fake_self.state_vectors
                     self.rewards = self.fake_self.rewards
                     self.actions = self.fake_self.actions
