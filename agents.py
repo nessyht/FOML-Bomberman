@@ -37,7 +37,7 @@ class AgentProcess(mp.Process):
         # CHANGED HES
         # Add variable which stores state vectors of respective round
         
-        self.state_vectors = np.empty((2, 528 + 6))
+        self.state_vectors = np.empty((2, 528 + 4))
         
         # 528 + 6 is the number of entries in the state vector
         
@@ -94,7 +94,7 @@ class AgentProcess(mp.Process):
             # CHANGED
             # Reset at beginning of each round
             self.fake_self.rewards = []
-            self.fake_self.state_vectors = [] # automatically turned into np.array later (using = np.concatenate(...))
+            self.fake_self.state_vectors = np.empty((2, 528 + 4)) # automatically turned into np.array later (using = np.concatenate(...))
             self.fake_self.actions = []
             # END OF CHANGED
 
@@ -120,6 +120,7 @@ class AgentProcess(mp.Process):
                         # Update reward for last step
                         # Rewards get appended on self.fake_self.rewards
                         self.code.reward_update(self.fake_self)
+                        self.wlogger.info('Added rewards to array.')
                         # END OF CHANGED KT
                     except Exception as e:
                         self.wlogger.exception(f'Error in callback function: {e}')
@@ -140,20 +141,20 @@ class AgentProcess(mp.Process):
                     # Creation of state vector
                     
                     # Check whether creation of state vector works
-                    if self.fake_self.game_state['step'] == 30: # TODO: delete this condition later
-                        if self.train_flag.is_set():
-                            
-                            # store state vector
-                            # self.state_vectors = np.concatenate((self.state_vectors, create_state_vector(self.fake_self)))
-                            # CHANGED 2
-                            self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, create_state_vector(self.fake_self)))
-                            print(self.fake_self.state_vectors)
-                            # END CHANGED 2
-                            self.wlogger.info(f'State vector added by agent.')
-                            
-                            # store chosen action
-                            self.fake_self.actions.append(self.fake_self.next_action)
-                            self.wlogger.info('Stored next action.')
+                    #if self.fake_self.game_state['step'] == 30: # TODO: delete this condition later
+                    if self.train_flag.is_set():
+                        
+                        # store state vector
+                        # self.state_vectors = np.concatenate((self.state_vectors, create_state_vector(self.fake_self)))
+                        # CHANGED 2
+                        self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, create_state_vector(self.fake_self).reshape((1,self.fake_self.state_vectors.shape[1]))))
+                        # print(self.fake_self.state_vectors)
+                        # END CHANGED 2
+                        self.wlogger.info(f'State vector added by agent.')
+                        
+                        # store chosen action
+                        self.fake_self.actions.append(self.fake_self.next_action)
+                        self.wlogger.info('Stored next action.')
                     
                     # END OF CHANGED HES
                 
@@ -183,19 +184,25 @@ class AgentProcess(mp.Process):
                 self.wlogger.debug(f'Received final event queue {self.fake_self.events}')
                 try:
                     self.code.end_of_episode(self.fake_self)
-
+                    self.wlogger.info('Added final reward to array.')
                     # CHANGED KT - could be moved into end_of_episode code may be more elegant
+                    print('State vector shape including two empty rows at end of round:',self.fake_self.state_vectors.shape)
+                    print('Length of rewards at end of round:',len(self.fake_self.rewards))
+                    
+                    # Delete first reward which is added before any action is performed.
+                    self.fake_self.rewards.pop(0)
                     
                     # Add rewards for each step to states
-                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(self.fake_self.rewards).reshape((len(self.fake_self.rewards),1))), axis = 1)
+                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors[2:,:], np.array(self.fake_self.rewards).reshape((len(self.fake_self.rewards),1))), axis = 1)
                     # Explanation for the line above:
+                    # Empty first two rows not used [2:,:]
                     # Goal is to add rewards as an additional column to each state
                     # Reshape so that states and rewards have the same number of dimensions, which is necessary for concatenate
                     # axis = 1 so that rewards are added as new column, not new row
                     
                     
                     # Add rewards for each episode to states
-                    total_rewards = np.ones((self.fake_self.rewards.shape[0]))*np.sum(self.fake_self.rewards)
+                    total_rewards = np.ones((len(self.fake_self.rewards)))*np.sum(self.fake_self.rewards)
                     self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(total_rewards).reshape((len(total_rewards),1))), axis = 1)
                     
                     # This makes sure that e.g. self.rewards always contains only the data of a single round.

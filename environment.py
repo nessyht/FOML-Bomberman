@@ -31,11 +31,11 @@ class BombeRLeWorld(object):
         # CHANGED HES:
         # Add variables which collect training data; Will later be accessed by main.py:
         
-        self.states = np.empty((2, 528 + 6))  # All states occurred during the season
+        self.states = np.empty((2, 528 + 4))  # All states occurred during the season
         self.actions = [] # All actions chosen after respective state occurred
         #self.rewards = [] # All cummulated rewards received after respective state occurred
         
-        self.current_round_states = np.empty((2, 528 + 6))
+        self.current_round_states = np.empty((2, 528 + 4))
         self.current_round_actions = []
         #self.current_round_rewards = []        
         
@@ -99,7 +99,7 @@ class BombeRLeWorld(object):
 
         # CHANGED:
         # clear current round states and actions
-        self.current_round_states = np.empty((2, 528 + 6))
+        self.current_round_states = np.empty((2, 528 + 4))
 
         self.current_round_actions = []
         #self.current_round_rewards = []
@@ -306,7 +306,7 @@ class BombeRLeWorld(object):
         # store training data
         
         if agent.train_flag.is_set():
-            self.current_round_states = np.concatenate((self.current_round_states, agent.process.state_vectors[2:,:]))
+            self.current_round_states = np.concatenate((self.current_round_states, agent.process.state_vectors))
             self.current_round_actions.extend(agent.process.actions)
             #self.current_round_rewards.extend(agent.process.rewards)
             

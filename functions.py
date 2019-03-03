@@ -91,7 +91,7 @@ def create_state_vector(self):
                       axis=-1).flatten()
     
     vector = np.concatenate((state, extras)) # combine extras and state vector
-    print(vector.shape)
+    #print('Shape of a single state vector:',vector.shape)
     
     # Confirmed: vector has the right shape and content
     # END OF CHANGED KT
