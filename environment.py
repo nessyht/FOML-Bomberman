@@ -309,6 +309,9 @@ class BombeRLeWorld(object):
             self.current_round_states = np.concatenate((self.current_round_states, agent.process.state_vectors[2:,:]))
             self.current_round_actions.extend(agent.process.actions)
             self.current_round_rewards.extend(agent.process.rewards)
+            
+            # Remark: Data needs to be extended/concatenated here so that different agents can add their data.
+            # Assigning the data of agents (i.e. using '=') would overwrite data of other agents 
         # END OF CHANGED HES
         
         agent.pipe.send(self.get_state_for_agent(agent, exit=True))
