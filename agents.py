@@ -196,11 +196,12 @@ class AgentProcess(mp.Process):
                 
                 # CHANGED KT - could be moved into end_of_episode code may be more elegant
                 print('State vector shape including two empty rows at end of round:',self.fake_self.state_vectors.shape)
-                print('Length of rewards at end of round:',len(self.fake_self.rewards))
+                
                 
                 # Delete first reward which is added before any action is performed.
                 self.fake_self.rewards.pop(0)
                 
+                print('Number of steps survived:',len(self.fake_self.rewards))
                 # Add rewards for each step to states
                 self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array([self.fake_self.rewards]).T), axis = 1)
 

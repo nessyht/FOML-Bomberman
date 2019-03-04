@@ -9,12 +9,12 @@ settings = {
     # Display
     'width': 1000,
     'height': 600,
-    'gui': True,
+    'gui': False,
     'fps': 15,
 
     # Main loop
 
-    'update_interval': 0.014, # 0.33,
+    'update_interval': 0, # 0.33,
     'turn_based': False,
     'n_rounds': 2, # 10
     'save_replay': False,
