@@ -85,6 +85,9 @@ class BombeRLeWorld(object):
 
 
     def setup_agents(self, agents):
+        # CHANGED
+        print('Entering World.setup_agents().')
+        # END OF CHANGED
         # Add specified agents and start their subprocesses
         self.agents = []
         for agent_dir, train in agents:
@@ -96,6 +99,10 @@ class BombeRLeWorld(object):
 
 
     def new_round(self):
+        
+        # CHANGED
+        print('Entering World.new_round().')
+        # END OF CHANGED
 
         # CHANGED:
         # clear current round states and actions
@@ -299,6 +306,9 @@ class BombeRLeWorld(object):
 
 
     def put_down_agent(self, agent):
+        # CHANGED
+        print('Entering World.put_down_agent().')
+        # END OF CHANGED
         # Send exit message to end round for this agent
         self.logger.debug(f'Send exit message to end round for {agent.name}')
         
@@ -412,6 +422,7 @@ class BombeRLeWorld(object):
 
 
     def time_to_stop(self):
+        
         # Check round stopping criteria
         if len(self.active_agents) == 0:
             self.logger.info(f'No agent left alive, wrap up round')
@@ -434,6 +445,9 @@ class BombeRLeWorld(object):
 
 
     def end_round(self):
+        # CHANGED
+        print('Entering World.end_round().')
+        # END OF CHANGED
         if self.running:
             # Wait in case there is still a game step running
             sleep(s.update_interval)
@@ -491,6 +505,9 @@ class BombeRLeWorld(object):
 
 
     def end(self):
+        # CHANGED
+        print('Entering World.end().')
+        # END OF CHANGED
         if self.running:
             self.end_round()
         self.logger.info('SHUT DOWN')

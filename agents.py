@@ -51,6 +51,10 @@ class AgentProcess(mp.Process):
         # END OF CHANGED HES
 
     def run(self):
+        # CHANGED
+        print('Entering AgentProcess.run().')
+        # END OF CHANGED
+        
         # Persistent 'self' object to pass to callback methods
         self.fake_self = SimpleNamespace(name=self.name)
 
