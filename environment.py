@@ -31,11 +31,11 @@ class BombeRLeWorld(object):
         # CHANGED HES:
         # Add variables which collect training data; Will later be accessed by main.py:
         
-        self.states = np.empty((2, 528 + 6))  # All states occurred during the season
+        self.states = None  # All states occurred during the season
         self.actions = [] # All actions chosen after respective state occurred
         #self.rewards = [] # All cummulated rewards received after respective state occurred
         
-        self.current_round_states = np.empty((2, 528 + 4))
+        self.current_round_states = None
         self.current_round_actions = []
         #self.current_round_rewards = []        
         
@@ -106,7 +106,7 @@ class BombeRLeWorld(object):
 
         # CHANGED:
         # clear current round states and actions
-        self.current_round_states = np.empty((2, 528 + 4))
+        self.current_round_states = None
 
         self.current_round_actions = []
         #self.current_round_rewards = []
@@ -445,10 +445,24 @@ class BombeRLeWorld(object):
                     
                     # CHANGED HES
                     # Receive current round states from agent
-                    self.current_round_states = a.pipe.recv()
-                    print('After pipe, shape of current round states:',self.current_round_states.shape)
-                    self.current_round_actions = a.pipe.recv()
-                    print('Length of current_round_actions:',len(self.current_round_actions))
+                    #self.current_round_states = a.pipe.recv()
+                    #self.current_round_actions = a.pipe.recv()
+                    
+                    agent_round_states = a.pipe.recv()
+                    print('After pipe, shape of current round states:',agent_round_states.shape)
+                    if self.current_round_states is None:
+                        self.current_round_states = agent_round_states
+                    else:
+                        self.current_round_states = np.concatenate((self.current_round_states, agent_round_states))
+                    
+                    agent_round_actions = a.pipe.recv()
+                    print('Length of current_round_actions:',len(agent_round_actions))
+
+                    if self.current_round_actions is None:
+                        self.current_round_actions = agent_round_actions
+                    else:
+                        self.current_round_actions = np.concatenate((self.current_round_actions, agent_round_actions))
+                    
                     # END OF CHANGED HES
                     
                     a.ready_flag.wait()

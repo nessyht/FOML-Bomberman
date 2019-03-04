@@ -36,7 +36,7 @@ class AgentProcess(mp.Process):
         
         # CHANGED HES
         # Add variable which stores state vectors of respective round
-        self.state_vectors = np.empty((2, 528 + 4))
+        self.state_vectors = None
         
         # 528 + 6 is the number of entries in the state vector
         
@@ -94,7 +94,7 @@ class AgentProcess(mp.Process):
             # CHANGED
             # Reset at beginning of each round
             self.fake_self.rewards = []
-            self.fake_self.state_vectors = np.empty((2, 528 + 4)) # automatically turned into np.array later (using = np.concatenate(...))
+            self.fake_self.state_vectors = None # automatically turned into np.array later (using = np.concatenate(...))
             self.fake_self.actions = []
             # END OF CHANGED
 
@@ -146,10 +146,14 @@ class AgentProcess(mp.Process):
                         
                         # store state vector
                         # self.state_vectors = np.concatenate((self.state_vectors, create_state_vector(self.fake_self)))
-                        # CHANGED 2
-                        self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, create_state_vector(self.fake_self).reshape((1,self.fake_self.state_vectors.shape[1]))))
+                        # CHANGED KT
+                        if self.fake_self.state_vectors is None:
+                            self.fake_self.state_vectors = create_state_vector(self.fake_self)[None,:]
+                        else:
+                            self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, create_state_vector(self.fake_self)[None,:]))
+
                         # print(self.fake_self.state_vectors)
-                        # END CHANGED 2
+                        # END CHANGED KT
                         self.wlogger.info(f'State vector added by agent.')
                         
                         # store chosen action
@@ -198,9 +202,9 @@ class AgentProcess(mp.Process):
                 self.fake_self.rewards.pop(0)
                 
                 # Add rewards for each step to states
-                self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors[2:,:], np.array(self.fake_self.rewards).reshape((len(self.fake_self.rewards),1))), axis = 1)
+                self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array([self.fake_self.rewards]).T), axis = 1)
+
                 # Explanation for the line above:
-                # Empty first two rows not used [2:,:]
                 # Goal is to add rewards as an additional column to each state
                 # Reshape so that states and rewards have the same number of dimensions, which is necessary for concatenate
                 # axis = 1 so that rewards are added as new column, not new row
@@ -208,8 +212,8 @@ class AgentProcess(mp.Process):
                 
                 # Add rewards for each episode to states
                 total_rewards = np.ones((len(self.fake_self.rewards)))*np.sum(self.fake_self.rewards)
-                self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(total_rewards).reshape((len(total_rewards),1))), axis = 1)
-                
+                self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array([total_rewards]).T), axis = 1)
+
                 print('Pass data to self from fake_self:')
                 print('State vector shape of fakeself:',self.fake_self.state_vectors.shape)
                 # This makes sure that e.g. self.rewards always contains only the data of a single round.
@@ -219,8 +223,10 @@ class AgentProcess(mp.Process):
                 print('After passing:\nShape of state vectors:',self.state_vectors.shape)
                 
                 # Send data through pipe
+                
                 self.pipe_to_world.send(self.state_vectors)
                 self.pipe_to_world.send(self.actions)
+                
                 # END OF CHANGED HES
                 
                 self.ready_flag.set()
