@@ -32,21 +32,35 @@ def game_logic(world, user_inputs):
                     raise
 
 def main():
-    train_main(2,[1,2])
+    agents = [('simple_agent', True),
+              ('simple_agent', True),
+              ('simple_agent', True),
+              ('simple_agent', True)]
     
-def train_main(episodes, generations_list):
+    train_main(agents, 2,[1,2])
+    
+def train_main(agents, episodes, generations_list):
+    '''
+    agents: array of tuples of agent dir names and training flag
+    episodes: number of episodes to be played per generation
+    generations_list: list of the generations that should be used to generate training data for (later with input to train from in callbacks to select correct trees); 0 = 4 simples
+    '''
     pygame.init()
 
     # Emulate Windows process spawning behaviour under Unix (for testing)
     # mp.set_start_method('spawn')
     for generation in generations_list:
         # Initialize environment and agents
-        world = BombeRLeWorld([
-                ('simple_agent', True),
-                ('simple_agent', True),
-                ('simple_agent', True),
-                ('simple_agent', True)
-            ])
+        # 0th generation is trained on 4 simples, after it is users choice
+        if generation == 0:
+            world = BombeRLeWorld([
+                    ('simple_agent', True),
+                    ('simple_agent', True),
+                    ('simple_agent', True),
+                    ('simple_agent', True)
+                ])
+        else:
+            world = BombeRLeWorld(agents)
         # world = ReplayWorld('Replay 2019-01-30 16:57:42')
         user_inputs = []
         
@@ -62,12 +76,7 @@ def train_main(episodes, generations_list):
                 world.ready_for_restart_flag.wait()
                 world.ready_for_restart_flag.clear()
                 world.new_round()
-        
-            # First render
-            if s.gui:
-                world.render()
-                pygame.display.flip()
-        
+              
             round_finished = False
             last_update = time()
             last_frame = time()
@@ -94,20 +103,14 @@ def train_main(episodes, generations_list):
                                 user_inputs.clear()
                             user_inputs.append(s.input_map.get(key_pressed))
         
-                if not world.running and not s.gui:
+                if not world.running:
                     round_finished = True
-        
-                # Rendering
-                if s.gui and (time()-last_frame >= 1/s.fps):
-                    world.render()
-                    pygame.display.flip()
+
+                sleep_time = 1/s.fps - (time() - last_frame)
+                if sleep_time > 0:
+                    sleep(sleep_time)
+                if not s.gui:
                     last_frame = time()
-                else:
-                    sleep_time = 1/s.fps - (time() - last_frame)
-                    if sleep_time > 0:
-                        sleep(sleep_time)
-                    if not s.gui:
-                        last_frame = time()
             
             # CHANGED KT
             # End of a round occurres here
@@ -146,6 +149,85 @@ def train_main(episodes, generations_list):
         world.end()
     
     # END OF CHANGED
+
+
+def game_main(agents, episodes, get_stats=False, save_replays=False):
+    '''
+    agents: array of tuples of agent dir names and training flag
+    episodes: number of episodes to be played
+    get_stats: flag to indicate whether stats should be gathered
+    save_replays: flag to indicate whether replays should be saved
+    '''
+    pygame.init()
+    
+    # Emulate Windows process spawning behaviour under Unix (for testing)
+    # mp.set_start_method('spawn')
+
+    # Initialize environment and agents
+    world = BombeRLeWorld(agents)
+    
+    # world = ReplayWorld('Replay 2019-01-30 16:57:42')
+    user_inputs = []
+
+    # Start game logic thread
+    t = threading.Thread(target=game_logic, args=(world, user_inputs))
+    t.daemon = True
+    t.start()
+
+    # Run one or more games
+    for i in range(s.n_rounds):
+        if not world.running:
+            world.ready_for_restart_flag.wait()
+            world.ready_for_restart_flag.clear()
+            world.new_round()
+
+        # First render
+        if s.gui:
+            world.render()
+            pygame.display.flip()
+
+        round_finished = False
+        last_update = time()
+        last_frame = time()
+        user_inputs.clear()
+
+        # Main game loop
+        while not round_finished:
+            # Grab events
+            key_pressed = None
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    world.end_round()
+                    world.end()
+                    return
+                elif event.type == KEYDOWN:
+                    key_pressed = event.key
+                    if key_pressed in (K_q, K_ESCAPE):
+                        world.end_round()
+                    if not world.running:
+                        round_finished = True
+                    # Convert keyboard input into actions
+                    if s.input_map.get(key_pressed):
+                        if s.turn_based:
+                            user_inputs.clear()
+                        user_inputs.append(s.input_map.get(key_pressed))
+
+            if not world.running and not s.gui:
+                round_finished = True
+
+            # Rendering
+            if s.gui and (time()-last_frame >= 1/s.fps):
+                world.render()
+                pygame.display.flip()
+                last_frame = time()
+            else:
+                sleep_time = 1/s.fps - (time() - last_frame)
+                if sleep_time > 0:
+                    sleep(sleep_time)
+                if not s.gui:
+                    last_frame = time()
+
+    world.end()
 
 if __name__ == '__main__':
     main()

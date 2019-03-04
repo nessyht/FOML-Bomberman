@@ -14,7 +14,7 @@ settings = {
 
     # Main loop
 
-    'update_interval': 0.01, # 0.33,
+    'update_interval': 0, # 0.33,
     'turn_based': False,
     'n_rounds': 2, # 10
     'save_replay': False,

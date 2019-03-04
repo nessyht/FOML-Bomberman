@@ -103,6 +103,7 @@ def training(states, actions, rewards, generation):
     states: a flattened numpy array representing the occurred states
     actions: a list of actions performed after respective state occurred
     rewards: a list of rewards received after respective action was performed
+    generation: int, generation number
     """
     
     # Check whether all arguments have the same number of entries

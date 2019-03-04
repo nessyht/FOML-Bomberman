@@ -4,8 +4,14 @@ import pickle
 from functions import create_state_vector
 
 
-def setup(agent):
+def setup(self):
     np.random.seed()
+    moves = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
+    self.regressors = []
+    self.generation = 1 # Let this be externally fixed
+    for move in moves:
+        self.regressors.append(pickle.loads(open('Training_data/' + f'{generation:03}' + '_' + move + '.txt', 'wb')))
+        
 
 def MB_probs(rewards, T=100):
     """
@@ -59,13 +65,9 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.3):
 def act(self):
     self.logger.info('Pick action from trees')
 
-    moves = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
-    regressors = []
-    generation = 1
-    for move in moves:
-        regressors.append(pickle.loads(open('Training_data/' + f'{generation:03}' + '_' + move + '.txt', 'wb')))
-        
+
     self.next_action = choose_action(regressors, create_state_vector(self), True)
+    print(self.next_action)
     
 def reward_update(agent):
     pass
