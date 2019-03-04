@@ -36,7 +36,6 @@ class AgentProcess(mp.Process):
         
         # CHANGED HES
         # Add variable which stores state vectors of respective round
-        print('Self state vector reset.')
         self.state_vectors = np.empty((2, 528 + 4))
         
         # 528 + 6 is the number of entries in the state vector
@@ -51,10 +50,7 @@ class AgentProcess(mp.Process):
         # END OF CHANGED HES
 
     def run(self):
-        # CHANGED
-        print('Entering AgentProcess.run().')
-        # END OF CHANGED
-        
+                
         # Persistent 'self' object to pass to callback methods
         self.fake_self = SimpleNamespace(name=self.name)
 
@@ -98,7 +94,6 @@ class AgentProcess(mp.Process):
             # CHANGED
             # Reset at beginning of each round
             self.fake_self.rewards = []
-            print('Fake_self state vector reset.')
             self.fake_self.state_vectors = np.empty((2, 528 + 4)) # automatically turned into np.array later (using = np.concatenate(...))
             self.fake_self.actions = []
             # END OF CHANGED

@@ -112,6 +112,7 @@ class BombeRLeWorld(object):
         #self.current_round_rewards = []
         
         # END OF CHANGED HES
+        
         if self.running:
             self.logger.warn('New round requested while still running')
             self.end_round()
@@ -306,30 +307,8 @@ class BombeRLeWorld(object):
 
 
     def put_down_agent(self, agent):
-        # CHANGED
-        print('Entering World.put_down_agent().')
-        # END OF CHANGED
         # Send exit message to end round for this agent
         self.logger.debug(f'Send exit message to end round for {agent.name}')
-        
-        """
-        # CHANGED HES:
-        # store training data
-        
-        if agent.train_flag.is_set():
-            print('Put down agent.')
-            print('Passing agent states to current round states.')
-            self.current_round_states = np.concatenate((self.current_round_states, agent.process.state_vectors))
-            self.current_round_actions.extend(agent.process.actions)
-            print('Shape of current round states:',self.current_round_states.shape)
-            print('Length of current round actions:',len(self.current_round_actions))
-            #self.current_round_rewards.extend(agent.process.rewards)
-            
-            # Remark: Data needs to be extended/concatenated here so that different agents can add their data.
-            # Assigning the data of agents (i.e. using '=') would overwrite data of other agents 
-        # END OF CHANGED HES
-        """
-        
         agent.pipe.send(self.get_state_for_agent(agent, exit=True))
         agent.ready_flag.wait()
         agent.ready_flag.clear()
@@ -486,23 +465,6 @@ class BombeRLeWorld(object):
                 self.replay['n_steps'] = self.step
                 with open(f'replays/{self.round_id}.pt', 'wb') as f:
                     pickle.dump(self.replay, f)
-            """
-            # CHANGED HES
-            print('Before ending round:')
-            for a in self.agents:
-                if a.train_flag.is_set():
-                    print('Passing agent states to current round states.')
-                    print('Shape of agent.state:', a.process.state_vectors.shape)
-                    self.current_round_states = np.concatenate((self.current_round_states, a.process.state_vectors))
-                    self.current_round_actions.extend(a.process.actions)
-                    print('Shape of current round states:',self.current_round_states.shape)
-                    print('Length of current round actions:',len(self.current_round_actions))
-                    #self.current_round_rewards.extend(agent.process.rewards)
-                    
-                    # Remark: Data needs to be extended/concatenated here so that different agents can add their data.
-                    # Assigning the data of agents (i.e. using '=') would overwrite data of other agents 
-            # END OF CHANGED HES
-            """
             
             # Mark round as ended
             self.running = False
