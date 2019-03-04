@@ -63,7 +63,7 @@ def act(self):
     regressors = []
     generation = 1
     for move in moves:
-        regressors.append(pickle.loads(open('reg_trees/' + move + str(generation) + '.txt', 'wb')))
+        regressors.append(pickle.loads(open('Training_data/' + f'{generation:03}' + '_' + move + '.txt', 'wb')))
         
     self.next_action = choose_action(regressors, create_state_vector(self), True)
     

@@ -121,10 +121,10 @@ def training(states, actions, rewards, generation):
         regressor = RandomForestRegressor() # Initialize Random Forest Regressor  
         #regressor = MLPRegressor(max_iter=500) # Initialize MLP Regressor (Neural Network)
         
-        print('Fitting ', move,'.') # Inform user about progress
+        print('Fitting ', f'{generation:03}', move) # Inform user about progress
         # Fit regressor on respective states/rewards
         regressor.fit(states[actions==move], rewards[actions==move])
-        pickle.dump(regressor, open('reg_trees/' + move + str(generation) + '.txt', 'wb')) # Store regressor in file e.g. 'UP.txt'
+        pickle.dump(regressor, open('Training_data/' + f'{generation:03}' + '_' + move + '.txt', 'wb')) # Store regressor in file e.g. 'UP.txt'
         
     print('Regressors stored.')
     
