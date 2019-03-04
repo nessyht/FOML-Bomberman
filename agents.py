@@ -36,12 +36,9 @@ class AgentProcess(mp.Process):
         
         # CHANGED HES
         # Add variable which stores state vectors of respective round
+        self.state_vectors = np.empty((2, 528 + 4))
         
-        self.state_vectors = np.empty((2, 528 + 6))
-        
-        # x17x5 + 6 is the presumed length of the state vectors
-        # 17x17 cells, 7x7 walls; 3 entries for each cell; + 6 single entries
-        # should be adjusted as soon as the exact number of entries is known
+        # 528 + 6 is the number of entries in the state vector
         
         # This is necessary because it makes using np.concatenate much easier
         
@@ -53,6 +50,7 @@ class AgentProcess(mp.Process):
         # END OF CHANGED HES
 
     def run(self):
+                
         # Persistent 'self' object to pass to callback methods
         self.fake_self = SimpleNamespace(name=self.name)
 
@@ -92,8 +90,13 @@ class AgentProcess(mp.Process):
                 self.wlogger.info('Received global exit message')
                 break
             self.wlogger.info(f'STARTING ROUND #{self.round}')
+            
+            # CHANGED
+            # Reset at beginning of each round
             self.fake_self.rewards = []
-            self.fake_self.state_vectors = []
+            self.fake_self.state_vectors = np.empty((2, 528 + 4)) # automatically turned into np.array later (using = np.concatenate(...))
+            self.fake_self.actions = []
+            # END OF CHANGED
 
             # Take steps until exit message for current round is received
             while True:
@@ -115,8 +118,10 @@ class AgentProcess(mp.Process):
                     try:
                         # CHANGED KT
                         # Update reward for last step
+                        # Rewards get appended on self.fake_self.rewards
                         self.code.reward_update(self.fake_self)
-                        # CHANGED KT
+                        self.wlogger.info('Added rewards to array.')
+                        # END OF CHANGED KT
                     except Exception as e:
                         self.wlogger.exception(f'Error in callback function: {e}')
                     self.wlogger.debug('Set flag to indicate readiness')
@@ -136,20 +141,20 @@ class AgentProcess(mp.Process):
                     # Creation of state vector
                     
                     # Check whether creation of state vector works
-                    if self.fake_self.game_state['step'] == 30: # delete this condition later
-                        if self.train_flag.is_set():
-                            
-                            # store state vector
-                            # self.state_vectors = np.concatenate((self.state_vectors, create_state_vector(self.fake_self)))
-                            # CHANGED 2
-                            self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, create_state_vector(self.fake_self)))
-                            print(self.fake_self.state_vectors)
-                            # END CHANGED 2
-                            self.wlogger.info(f'State vector added by agent.')
-                            
-                            # store chosen action
-                            self.actions.append(self.fake_self.next_action)
-                            self.wlogger.info('Stored next action.')
+                    #if self.fake_self.game_state['step'] == 30: # TODO: delete this condition later
+                    if self.train_flag.is_set():
+                        
+                        # store state vector
+                        # self.state_vectors = np.concatenate((self.state_vectors, create_state_vector(self.fake_self)))
+                        # CHANGED 2
+                        self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, create_state_vector(self.fake_self).reshape((1,self.fake_self.state_vectors.shape[1]))))
+                        # print(self.fake_self.state_vectors)
+                        # END CHANGED 2
+                        self.wlogger.info(f'State vector added by agent.')
+                        
+                        # store chosen action
+                        self.fake_self.actions.append(self.fake_self.next_action)
+                        self.wlogger.info('Stored next action.')
                     
                     # END OF CHANGED HES
                 
@@ -176,26 +181,48 @@ class AgentProcess(mp.Process):
                 self.wlogger.info('Finalize agent\'s training')
                 self.wlogger.debug('Receive final event queue')
                 self.fake_self.events = self.pipe_to_world.recv()
-                self.wlogger.debug(f'Received final event queue {self.fake_self.events}')
+                self.wlogger.debug(f'Received final event queue {self.fake_self.events}')                
+              
                 try:
                     self.code.end_of_episode(self.fake_self)
-
-                    # CHANGED KT - could be moved into end_of_episode code may be more elegant
-                    # Add rewards for each step to states
-                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(self.fake_self.rewards).T), axis = 1)
-                    
-                    # Add rewards for each episode to states
-                    total_rewards = np.ones((self.fake_self.rewards.shape[0]))*np.sum(self.fake_self.rewards)
-                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(total_rewards).T), axis = 1)
-                    self.state_vectors = self.fake_self.state_vectors
-                    # END OF CHANGED
-                    # CHANGED HES
-                    # Add rewards to agent process                    
-                    self.rewards = self.fake_self.rewards                 
-                    # END OF CHANGED HES
-                                  
+                    self.wlogger.info('Added final reward to array.')
+                                                      
                 except Exception as e:
                     self.wlogger.exception(f'Error in callback function: {e}')
+                
+                # CHANGED KT - could be moved into end_of_episode code may be more elegant
+                print('State vector shape including two empty rows at end of round:',self.fake_self.state_vectors.shape)
+                print('Length of rewards at end of round:',len(self.fake_self.rewards))
+                
+                # Delete first reward which is added before any action is performed.
+                self.fake_self.rewards.pop(0)
+                
+                # Add rewards for each step to states
+                self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors[2:,:], np.array(self.fake_self.rewards).reshape((len(self.fake_self.rewards),1))), axis = 1)
+                # Explanation for the line above:
+                # Empty first two rows not used [2:,:]
+                # Goal is to add rewards as an additional column to each state
+                # Reshape so that states and rewards have the same number of dimensions, which is necessary for concatenate
+                # axis = 1 so that rewards are added as new column, not new row
+                
+                
+                # Add rewards for each episode to states
+                total_rewards = np.ones((len(self.fake_self.rewards)))*np.sum(self.fake_self.rewards)
+                self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(total_rewards).reshape((len(total_rewards),1))), axis = 1)
+                
+                print('Pass data to self from fake_self:')
+                print('State vector shape of fakeself:',self.fake_self.state_vectors.shape)
+                # This makes sure that e.g. self.rewards always contains only the data of a single round.
+                self.state_vectors = self.fake_self.state_vectors
+                self.rewards = self.fake_self.rewards
+                self.actions = self.fake_self.actions
+                print('After passing:\nShape of state vectors:',self.state_vectors.shape)
+                
+                # Send data through pipe
+                self.pipe_to_world.send(self.state_vectors)
+                self.pipe_to_world.send(self.actions)
+                # END OF CHANGED HES
+                
                 self.ready_flag.set()
 
             self.wlogger.info(f'Round #{self.round} finished')

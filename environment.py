@@ -33,11 +33,11 @@ class BombeRLeWorld(object):
         
         self.states = np.empty((2, 528 + 6))  # All states occurred during the season
         self.actions = [] # All actions chosen after respective state occurred
-        self.rewards = [] # All cummulated rewards received after respective state occurred
+        #self.rewards = [] # All cummulated rewards received after respective state occurred
         
-        self.current_round_states = np.empty((2, 528 + 6))
+        self.current_round_states = np.empty((2, 528 + 4))
         self.current_round_actions = []
-        self.current_round_rewards = []        
+        #self.current_round_rewards = []        
         
         # END OF CHANGED HES
         
@@ -85,6 +85,9 @@ class BombeRLeWorld(object):
 
 
     def setup_agents(self, agents):
+        # CHANGED
+        print('Entering World.setup_agents().')
+        # END OF CHANGED
         # Add specified agents and start their subprocesses
         self.agents = []
         for agent_dir, train in agents:
@@ -96,15 +99,20 @@ class BombeRLeWorld(object):
 
 
     def new_round(self):
+        
+        # CHANGED
+        print('Entering World.new_round().')
+        # END OF CHANGED
 
         # CHANGED:
         # clear current round states and actions
-        self.current_round_states = np.empty((2, 528 + 6))
+        self.current_round_states = np.empty((2, 528 + 4))
 
         self.current_round_actions = []
-        self.current_round_rewards = []
+        #self.current_round_rewards = []
         
         # END OF CHANGED HES
+        
         if self.running:
             self.logger.warn('New round requested while still running')
             self.end_round()
@@ -301,16 +309,6 @@ class BombeRLeWorld(object):
     def put_down_agent(self, agent):
         # Send exit message to end round for this agent
         self.logger.debug(f'Send exit message to end round for {agent.name}')
-        
-        # CHANGED HES:
-        # store training data
-        
-        if agent.train_flag.is_set():
-            self.current_round_states = np.concatenate((self.current_round_states, agent.process.state_vectors[2:,:]))
-            self.current_round_actions.extend(agent.process.actions)
-            self.current_round_rewards.extend(agent.process.rewards)
-        # END OF CHANGED HES
-        
         agent.pipe.send(self.get_state_for_agent(agent, exit=True))
         agent.ready_flag.wait()
         agent.ready_flag.clear()
@@ -403,6 +401,7 @@ class BombeRLeWorld(object):
 
 
     def time_to_stop(self):
+        
         # Check round stopping criteria
         if len(self.active_agents) == 0:
             self.logger.info(f'No agent left alive, wrap up round')
@@ -425,6 +424,9 @@ class BombeRLeWorld(object):
 
 
     def end_round(self):
+        # CHANGED
+        print('Entering World.end_round().')
+        # END OF CHANGED
         if self.running:
             # Wait in case there is still a game step running
             sleep(s.update_interval)
@@ -440,6 +442,15 @@ class BombeRLeWorld(object):
                     self.logger.debug(f'Sending final event queue {a.events} to agent <{a.name}>')
                     a.pipe.send(a.events)
                     a.events = []
+                    
+                    # CHANGED HES
+                    # Receive current round states from agent
+                    self.current_round_states = a.pipe.recv()
+                    print('After pipe, shape of current round states:',self.current_round_states.shape)
+                    self.current_round_actions = a.pipe.recv()
+                    print('Length of current_round_actions:',len(self.current_round_actions))
+                    # END OF CHANGED HES
+                    
                     a.ready_flag.wait()
                     a.ready_flag.clear()
             # Penalty for agent who spent most time thinking
@@ -454,6 +465,7 @@ class BombeRLeWorld(object):
                 self.replay['n_steps'] = self.step
                 with open(f'replays/{self.round_id}.pt', 'wb') as f:
                     pickle.dump(self.replay, f)
+            
             # Mark round as ended
             self.running = False
         else:
@@ -464,6 +476,9 @@ class BombeRLeWorld(object):
 
 
     def end(self):
+        # CHANGED
+        print('Entering World.end().')
+        # END OF CHANGED
         if self.running:
             self.end_round()
         self.logger.info('SHUT DOWN')
