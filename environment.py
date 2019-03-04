@@ -31,7 +31,7 @@ class BombeRLeWorld(object):
         # CHANGED HES:
         # Add variables which collect training data; Will later be accessed by main.py:
         
-        self.states = np.empty((2, 528 + 4))  # All states occurred during the season
+        self.states = np.empty((2, 528 + 6))  # All states occurred during the season
         self.actions = [] # All actions chosen after respective state occurred
         #self.rewards = [] # All cummulated rewards received after respective state occurred
         
@@ -463,6 +463,15 @@ class BombeRLeWorld(object):
                     self.logger.debug(f'Sending final event queue {a.events} to agent <{a.name}>')
                     a.pipe.send(a.events)
                     a.events = []
+                    
+                    # CHANGED HES
+                    # Receive current round states from agent
+                    self.current_round_states = a.pipe.recv()
+                    print('After pipe, shape of current round states:',self.current_round_states.shape)
+                    self.current_round_actions = a.pipe.recv()
+                    print('Length of current_round_actions:',len(self.current_round_actions))
+                    # END OF CHANGED HES
+                    
                     a.ready_flag.wait()
                     a.ready_flag.clear()
             # Penalty for agent who spent most time thinking
@@ -477,7 +486,7 @@ class BombeRLeWorld(object):
                 self.replay['n_steps'] = self.step
                 with open(f'replays/{self.round_id}.pt', 'wb') as f:
                     pickle.dump(self.replay, f)
-            
+            """
             # CHANGED HES
             print('Before ending round:')
             for a in self.agents:
@@ -493,7 +502,7 @@ class BombeRLeWorld(object):
                     # Remark: Data needs to be extended/concatenated here so that different agents can add their data.
                     # Assigning the data of agents (i.e. using '=') would overwrite data of other agents 
             # END OF CHANGED HES
-            
+            """
             
             # Mark round as ended
             self.running = False

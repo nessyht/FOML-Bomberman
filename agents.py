@@ -186,41 +186,48 @@ class AgentProcess(mp.Process):
                 self.wlogger.info('Finalize agent\'s training')
                 self.wlogger.debug('Receive final event queue')
                 self.fake_self.events = self.pipe_to_world.recv()
-                self.wlogger.debug(f'Received final event queue {self.fake_self.events}')
+                self.wlogger.debug(f'Received final event queue {self.fake_self.events}')                
+              
                 try:
                     self.code.end_of_episode(self.fake_self)
                     self.wlogger.info('Added final reward to array.')
-                    # CHANGED KT - could be moved into end_of_episode code may be more elegant
-                    print('State vector shape including two empty rows at end of round:',self.fake_self.state_vectors.shape)
-                    print('Length of rewards at end of round:',len(self.fake_self.rewards))
-                    
-                    # Delete first reward which is added before any action is performed.
-                    self.fake_self.rewards.pop(0)
-                    
-                    # Add rewards for each step to states
-                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors[2:,:], np.array(self.fake_self.rewards).reshape((len(self.fake_self.rewards),1))), axis = 1)
-                    # Explanation for the line above:
-                    # Empty first two rows not used [2:,:]
-                    # Goal is to add rewards as an additional column to each state
-                    # Reshape so that states and rewards have the same number of dimensions, which is necessary for concatenate
-                    # axis = 1 so that rewards are added as new column, not new row
-                    
-                    
-                    # Add rewards for each episode to states
-                    total_rewards = np.ones((len(self.fake_self.rewards)))*np.sum(self.fake_self.rewards)
-                    self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(total_rewards).reshape((len(total_rewards),1))), axis = 1)
-                    
-                    print('Pass data to self from fake_self:')
-                    print('State vector shape of fakeself:',self.fake_self.state_vectors.shape)
-                    # This makes sure that e.g. self.rewards always contains only the data of a single round.
-                    self.state_vectors = self.fake_self.state_vectors
-                    self.rewards = self.fake_self.rewards
-                    self.actions = self.fake_self.actions
-                    print('After passing:\nShape of state vectors:',self.state_vectors.shape)
-                    # END OF CHANGED HES
-                                  
+                                                      
                 except Exception as e:
                     self.wlogger.exception(f'Error in callback function: {e}')
+                
+                # CHANGED KT - could be moved into end_of_episode code may be more elegant
+                print('State vector shape including two empty rows at end of round:',self.fake_self.state_vectors.shape)
+                print('Length of rewards at end of round:',len(self.fake_self.rewards))
+                
+                # Delete first reward which is added before any action is performed.
+                self.fake_self.rewards.pop(0)
+                
+                # Add rewards for each step to states
+                self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors[2:,:], np.array(self.fake_self.rewards).reshape((len(self.fake_self.rewards),1))), axis = 1)
+                # Explanation for the line above:
+                # Empty first two rows not used [2:,:]
+                # Goal is to add rewards as an additional column to each state
+                # Reshape so that states and rewards have the same number of dimensions, which is necessary for concatenate
+                # axis = 1 so that rewards are added as new column, not new row
+                
+                
+                # Add rewards for each episode to states
+                total_rewards = np.ones((len(self.fake_self.rewards)))*np.sum(self.fake_self.rewards)
+                self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array(total_rewards).reshape((len(total_rewards),1))), axis = 1)
+                
+                print('Pass data to self from fake_self:')
+                print('State vector shape of fakeself:',self.fake_self.state_vectors.shape)
+                # This makes sure that e.g. self.rewards always contains only the data of a single round.
+                self.state_vectors = self.fake_self.state_vectors
+                self.rewards = self.fake_self.rewards
+                self.actions = self.fake_self.actions
+                print('After passing:\nShape of state vectors:',self.state_vectors.shape)
+                
+                # Send data through pipe
+                self.pipe_to_world.send(self.state_vectors)
+                self.pipe_to_world.send(self.actions)
+                # END OF CHANGED HES
+                
                 self.ready_flag.set()
 
             self.wlogger.info(f'Round #{self.round} finished')
