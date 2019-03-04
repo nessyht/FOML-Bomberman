@@ -11,7 +11,7 @@ import threading
 
 from environment import BombeRLeWorld, ReplayWorld
 from settings import s
-
+from functions import training
 
 # Function to run the game logic in a separate thread
 def game_logic(world, user_inputs):
@@ -31,118 +31,121 @@ def game_logic(world, user_inputs):
                     world.end_round()
                     raise
 
-
 def main():
+    train_main(2,[1,2])
+    
+def train_main(episodes, generations_list):
     pygame.init()
 
     # Emulate Windows process spawning behaviour under Unix (for testing)
     # mp.set_start_method('spawn')
-
-    # Initialize environment and agents
-    world = BombeRLeWorld([
-            ('simple_agent', True),
-            ('simple_agent', False),
-            ('simple_agent', False),
-            ('simple_agent', False)
-        ])
-    # world = ReplayWorld('Replay 2019-01-30 16:57:42')
-    user_inputs = []
-
-    # Start game logic thread
-    t = threading.Thread(target=game_logic, args=(world, user_inputs))
-    t.daemon = True
-    t.start()
-
-    # Run one or more games
-    for i in range(s.n_rounds):
-        if not world.running:
-            world.ready_for_restart_flag.wait()
-            world.ready_for_restart_flag.clear()
-            world.new_round()
-
-        # First render
-        if s.gui:
-            world.render()
-            pygame.display.flip()
-
-        round_finished = False
-        last_update = time()
-        last_frame = time()
-        user_inputs.clear()
-
-        # Main game loop
-        while not round_finished:
-            # Grab events
-            key_pressed = None
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    world.end_round()
-                    world.end()
-                    return
-                elif event.type == KEYDOWN:
-                    key_pressed = event.key
-                    if key_pressed in (K_q, K_ESCAPE):
-                        world.end_round()
-                    if not world.running:
-                        round_finished = True
-                    # Convert keyboard input into actions
-                    if s.input_map.get(key_pressed):
-                        if s.turn_based:
-                            user_inputs.clear()
-                        user_inputs.append(s.input_map.get(key_pressed))
-
-            if not world.running and not s.gui:
-                round_finished = True
-
-            # Rendering
-            if s.gui and (time()-last_frame >= 1/s.fps):
+    for generation in generations_list:
+        # Initialize environment and agents
+        world = BombeRLeWorld([
+                ('simple_agent', True),
+                ('simple_agent', True),
+                ('simple_agent', True),
+                ('simple_agent', True)
+            ])
+        # world = ReplayWorld('Replay 2019-01-30 16:57:42')
+        user_inputs = []
+        
+        # Start game logic thread
+        t = threading.Thread(target=game_logic, args=(world, user_inputs))
+        t.daemon = True
+        t.start()
+        
+        # Run one or more games
+        for i in range(episodes):
+            
+            if not world.running:
+                world.ready_for_restart_flag.wait()
+                world.ready_for_restart_flag.clear()
+                world.new_round()
+        
+            # First render
+            if s.gui:
                 world.render()
                 pygame.display.flip()
-                last_frame = time()
-            else:
-                sleep_time = 1/s.fps - (time() - last_frame)
-                if sleep_time > 0:
-                    sleep(sleep_time)
-                if not s.gui:
+        
+            round_finished = False
+            last_update = time()
+            last_frame = time()
+            user_inputs.clear()
+        
+            # Main game loop
+            while not round_finished:
+                # Grab events
+                key_pressed = None
+                for event in pygame.event.get():
+                    if event.type == QUIT:
+                        world.end_round()
+                        world.end()
+                        return
+                    elif event.type == KEYDOWN:
+                        key_pressed = event.key
+                        if key_pressed in (K_q, K_ESCAPE):
+                            world.end_round()
+                        if not world.running:
+                            round_finished = True
+                        # Convert keyboard input into actions
+                        if s.input_map.get(key_pressed):
+                            if s.turn_based:
+                                user_inputs.clear()
+                            user_inputs.append(s.input_map.get(key_pressed))
+        
+                if not world.running and not s.gui:
+                    round_finished = True
+        
+                # Rendering
+                if s.gui and (time()-last_frame >= 1/s.fps):
+                    world.render()
+                    pygame.display.flip()
                     last_frame = time()
+                else:
+                    sleep_time = 1/s.fps - (time() - last_frame)
+                    if sleep_time > 0:
+                        sleep(sleep_time)
+                    if not s.gui:
+                        last_frame = time()
+            
+            # CHANGED KT
+            # End of a round occurres here
+            # This is what happens after round_finished was set True
+            
+            # Add data of the current round to the data of the entire season
+            print('Passing current round states to world states.')
+            print('Current Round States Shape:', world.current_round_states.shape)
+        
+            if world.states is None:
+                world.states = world.current_round_states
+            else:
+                world.states = np.concatenate((world.states, world.current_round_states))            
+                print('Shape of world states:', world.states.shape)
+            world.actions.extend(world.current_round_actions)   
+        
+            print('World States Shape:', world.states.shape)        
+            print('Length of world actions:', len(world.actions))         
+            #world.rewards.extend(world.current_round_rewards)
+            
+            # END OCHANGED KT
         
         # CHANGED:
-        # End of a round occurres here
-        # This is what happens after round_finished was set True
+        # Arrays which contain the training data generated by the entire season (n rounds):
         
-        # Add data of the current round to the data of the entire season
-        print('Passing current round states to world states.')
-        print('Current Round States Shape:', world.current_round_states.shape)
-
-        if world.states is None:
-            world.states = world.current_round_states
-        else:
-            world.states = np.concatenate((world.states, world.current_round_states))            
-            print('Shape of world states:', world.states.shape)
-        world.actions.extend(world.current_round_actions)   
-
-        print('World States Shape:', world.states.shape)        
-        print('Length of world actions:', len(world.actions))         
-        #world.rewards.extend(world.current_round_rewards)
+        print('Passing wold states to global states.')
+        states = world.states  # All states occurred during the season
+        actions = world.actions # All actions chosen after respective state occurred
+        #rewards = world.rewards # All cummulated rewards received after respective state occurred
         
-        # END OF CHANGED
-
-    # CHANGED:
-    # Arrays which contain the training data generated by the entire season (n rounds):
-    
-    print('Passing wold states to global states.')
-    states = world.states  # All states occurred during the season
-    actions = world.actions # All actions chosen after respective state occurred
-    #rewards = world.rewards # All cummulated rewards received after respective state occurred
-    
-    print('Shape of final state vector:',states.shape)
-    print('Shape of final actions:',len(actions))
-    
-    
-    world.end()
+        print('Shape of final state vector:',states.shape)
+        print('Shape of final actions:',len(actions))
+        print('Shape of final rewards', states[:, -2].shape)
+        training(states, np.array(actions), states[:, -2], generation)
+        
+        world.end()
     
     # END OF CHANGED
-
 
 if __name__ == '__main__':
     main()

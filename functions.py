@@ -4,7 +4,6 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.neural_network import MLPRegressor
 import pickle
 
-
 def create_state_vector(self):
     """
     This function is called in agents.py after act(self) was called.
@@ -99,7 +98,7 @@ def create_state_vector(self):
     return vector
     
 
-def training(states, actions, rewards):
+def training(states, actions, rewards, generation):
     """
     states: a flattened numpy array representing the occurred states
     actions: a list of actions performed after respective state occurred
@@ -125,56 +124,7 @@ def training(states, actions, rewards):
         print('Fitting ', move,'.') # Inform user about progress
         # Fit regressor on respective states/rewards
         regressor.fit(states[actions==move], rewards[actions==move])
-        pickle.dump(regressor, open(move + '.txt', 'wb')) # Store regressor in file e.g. 'UP.txt'
+        pickle.dump(regressor, open('reg_trees/' + move + str(generation) + '.txt', 'wb')) # Store regressor in file e.g. 'UP.txt'
         
     print('Regressors stored.')
-
-def MB_probs(rewards, T=100):
-    """
-    returns probabilities for exploring based on a Max-Boltzman-distribution
-    rewards: array/list with expected rewards
-    """
-    Q = np.array(rewards)
-    denom = np.sum(np.exp(np.divide(Q,T)))
-    return np.divide(np.exp(np.divide(Q,T)),denom)
-    
-def choose_action(regressor_list, state, exploring=False, epsilon=0.3):
-    """
-    regressor_list: list of regressors in order: up,down,left,right,wait,bomb
-    state: the state for which to find the best action
-    exploring: whether agent should explore different actions
-    epsilon: probability with which we will explore
-    """
-    
-    # list of actions in the same order as corresponding actions in regressor_list
-    actions = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
-    
-    predicted_reward = []
-    
-    # predict expected reward for each action
-    for reg in regressor_list:
-        predicted_reward.append(reg.predict(state))
-    
-    exploit = np.argmax(predicted_reward) # Index of action with highest reward
-    
-    if not exploring:
-        # Choose action with highest expected reward
-        return actions[exploit]
-    
-    # Will we explore?
-    explore = np.random.choice([True, False], p=[epsilon, 1-epsilon])
-    
-    if not explore:
-        # Choose action with highest expected reward
-        return actions[exploit]
-    
-    if explore:
-        # Remove highest reward from selection
-        actions.pop([exploit])
-        predicted_reward.pop([exploit])
-        
-        mean_reward_size = np.mean(np.abs(predicted_reward))
-        probabilities = MB_probs(predicted_reward, T=mean_reward_size)
-        
-        return np.random.choice(actions, p=probabilities)
     
