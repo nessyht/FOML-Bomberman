@@ -114,7 +114,7 @@ def main():
         print('Passing current round states to world states.')
         print('Current Round States Shape:', world.current_round_states.shape)
         print('World States Shape:', world.states.shape)
-        world.states = np.concatenate((world.states, world.current_round_states[2:,:]))            
+        world.states = np.concatenate((world.states, world.current_round_states))            
         world.actions.extend(world.current_round_actions)   
         print('Shape of world states:', world.states.shape)
         print('Length of world actions:', len(world.actions))         
