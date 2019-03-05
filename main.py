@@ -131,7 +131,7 @@ def train_main(agents, episodes, generations_list):
                 # print('Shape of world states:', world.states.shape)
             world.actions.extend(world.current_round_actions)   
             
-            print('Ending ' + str(i) + ' of ' + str(generation))
+            print('Ending ' + str(i) + ' of ' + str(episodes) + ' of generation ' + str(generation))
         
             # print('World States Shape:', world.states.shape)        
             # print('Length of world actions:', len(world.actions))         
