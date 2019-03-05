@@ -109,8 +109,7 @@ def train_main(agents, episodes, generations_list):
                 sleep_time = 1/s.fps - (time() - last_frame)
                 if sleep_time > 0:
                     sleep(sleep_time)
-                if not s.gui:
-                    last_frame = time()
+                last_frame = time()
             
             # CHANGED KT
             # End of a round occurres here
@@ -144,7 +143,7 @@ def train_main(agents, episodes, generations_list):
         print('Shape of final state vector:',states.shape)
         print('Shape of final actions:',len(actions))
         print('Shape of final rewards', states[:, -2].shape)
-        training(states, np.array(actions), states[:, -2], generation)
+        training(states[:,:-2], np.array(actions), states[:, -1], generation)
         
         world.end()
     

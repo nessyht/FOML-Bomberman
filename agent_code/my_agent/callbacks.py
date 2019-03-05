@@ -10,7 +10,7 @@ def setup(self):
     self.regressors = []
     self.generation = 1 # Let this be externally fixed
     for move in moves:
-        self.regressors.append(pickle.loads(open('Training_data/' + f'{generation:03}' + '_' + move + '.txt', 'wb')))
+        self.regressors.append(pickle.loads(open('Training_data/' + f'{self.generation:03}' + '_' + move + '.txt', 'wb')))
         
 
 def MB_probs(rewards, T=100):
