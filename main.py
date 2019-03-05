@@ -33,12 +33,12 @@ def game_logic(world, user_inputs):
                     raise
 
 def main():
-    agents = [('simple_agent', True),
-              ('simple_agent', True),
-              ('simple_agent', True),
-              ('simple_agent', True)]
+    agents = [('my_agent', True),
+              ('simple_agent', False),
+              ('simple_agent', False),
+              ('simple_agent', False)]
     
-    train_main(agents, 1000,[0])
+    train_main(agents, 5,[0,1,2,3])
     
 def train_main(agents, episodes, generations_list):
     '''
@@ -62,9 +62,12 @@ def train_main(agents, episodes, generations_list):
                     ('simple_agent', True),
                     ('simple_agent', True),
                     ('simple_agent', True)
-                ])
+                ], generation)
         else:
-            world = BombeRLeWorld(agents)
+            world = BombeRLeWorld(agents, generation)
+            
+        # Pass generation to world in order to pass it to agents
+        #world.generation = generation
 
         # world = ReplayWorld('Replay 2019-01-30 16:57:42')
         user_inputs = []
@@ -131,7 +134,7 @@ def train_main(agents, episodes, generations_list):
                 # print('Shape of world states:', world.states.shape)
             world.actions.extend(world.current_round_actions)   
             
-            print('Ending ' + str(i) + ' of ' + str(episodes) + ' of generation ' + str(generation))
+            print('Ending round ' + str(i) + ' of ' + str(episodes) + ' of generation ' + str(generation))
         
             # print('World States Shape:', world.states.shape)        
             # print('Length of world actions:', len(world.actions))         
@@ -150,9 +153,12 @@ def train_main(agents, episodes, generations_list):
         print('Shape of final state vector:',states.shape)
         # print('Shape of final actions:',len(actions))
         # print('Shape of final rewards', states[:, -2].shape)
+        
+        # Train regressor
         training(states[:,:-2], np.array(actions), states[:, -1], generation)
-               
-        pickle.dump([states, actions], open('agent_code/my_agent/Training_data/data/' + f'{generation:03}' + '_data.txt', 'wb')) # Store regressor in file e.g. 'UP.txt'
+        
+        # Store training data
+        pickle.dump([states, actions], open('agent_code/my_agent/Training_data/data/' + f'{generation:03}' + '_data.txt', 'wb'))
         print('States stored')
         print('Time taken to gather training data for generation ' + str(generation) + ' was:', time()-gen_time,
               '\nAverage episode time =', (time()-gen_time)/episodes)

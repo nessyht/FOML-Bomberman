@@ -8,9 +8,11 @@ def setup(self):
     np.random.seed()
     moves = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
     self.regressors = []
-    self.generation = 0 # Let this be externally fixed
+    #self.generation = 0 # Let this be externally fixed
+    generation = self.generation - 1
+    print('Agent now training with generation ', generation)
     for move in moves:
-        self.regressors.append(pickle.loads(open('agent_code/my_agent/Training_data/trees/' + f'{self.generation:03}' + '_' + move + '.txt', 'wb')))
+        self.regressors.append(pickle.load(open('agent_code/my_agent/Training_data/trees/' + f'{generation:03}' + '_' + move + '.txt', 'rb')))
         
 
 def MB_probs(rewards, T=100):
@@ -22,7 +24,7 @@ def MB_probs(rewards, T=100):
     denom = np.sum(np.exp(np.divide(Q,T)))
     return np.divide(np.exp(np.divide(Q,T)),denom)
     
-def choose_action(regressor_list, state, exploring=False, epsilon=0.3):
+def choose_action(regressor_list, state, exploring=False, epsilon=0.25):
     """
     regressor_list: list of regressors in order: up,down,left,right,wait,bomb
     state: the state for which to find the best action
@@ -37,7 +39,7 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.3):
     
     # predict expected reward for each action
     for reg in regressor_list:
-        predicted_reward.append(reg.predict(state))
+        predicted_reward.append(reg.predict(state.reshape(1, -1)))
     
     exploit = np.argmax(predicted_reward) # Index of action with highest reward
     
@@ -65,7 +67,7 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.3):
 def act(self):
     self.logger.info('Pick action from trees')
     
-    self.next_action = choose_action(self.regressors, create_state_vector(self), self.train_flag.is_set(), True)
+    self.next_action = choose_action(self.regressors, create_state_vector(self), exploring=self.train_flag.is_set())
     print(self.next_action)
     
 def reward_update(self):

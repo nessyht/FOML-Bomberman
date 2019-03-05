@@ -19,11 +19,13 @@ from settings import s, e
 
 class BombeRLeWorld(object):
 
-    def __init__(self, agents):
+    def __init__(self, agents, generation):
         self.setup_logging()
         if s.gui:
             self.setup_gui()
 
+        self.generation = generation
+        
         # Available robot colors
         self.colors = ['blue', 'green', 'yellow', 'pink']
         self.setup_agents(agents)
@@ -38,6 +40,7 @@ class BombeRLeWorld(object):
         self.current_round_states = None
         self.current_round_actions = []
         #self.current_round_rewards = []        
+        
         
         # END OF CHANGED HES
         
@@ -188,12 +191,19 @@ class BombeRLeWorld(object):
             if train:
                 train_flag.set()
             p = AgentProcess(pipe_to_world, ready_flag, name, agent_dir, train_flag)
+            p.generation = self.generation
             self.logger.info(f'Starting process for agent <{name}>')
             p.start()
 
             # Create the agent container object
             agent = Agent(p, pipe_to_agent, ready_flag, self.colors.pop(), train_flag)
+            
+            # Pass generation to agent
+            agent.process.generation = self.generation
+            
             self.agents.append(agent)
+            
+            
 
             # Make sure process setup is finished
             self.logger.debug(f'Waiting for setup of agent <{agent.name}>')
