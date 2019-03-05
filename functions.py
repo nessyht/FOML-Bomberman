@@ -125,7 +125,7 @@ def training(states, actions, rewards, generation):
         print('Fitting ', f'{generation:03}', move) # Inform user about progress
         # Fit regressor on respective states/rewards
         regressor.fit(states[actions==move], rewards[actions==move])
-        pickle.dump(regressor, open('Training_data/' + f'{generation:03}' + '_' + move + '.txt', 'wb')) # Store regressor in file e.g. 'UP.txt'
+        pickle.dump(regressor, open('agent_code/my_agent/Training_data/trees/' + f'{generation:03}' + '_' + move + '.txt', 'wb')) # Store regressor in file e.g. 'UP.txt'
         
     print('Regressors stored.')
     

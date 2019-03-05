@@ -86,7 +86,7 @@ class BombeRLeWorld(object):
 
     def setup_agents(self, agents):
         # CHANGED
-        print('Entering World.setup_agents().')
+        # print('Entering World.setup_agents().')
         # END OF CHANGED
         # Add specified agents and start their subprocesses
         self.agents = []
@@ -101,7 +101,7 @@ class BombeRLeWorld(object):
     def new_round(self):
         
         # CHANGED
-        print('Entering World.new_round().')
+        # print('Entering World.new_round().')
         # END OF CHANGED
 
         # CHANGED:
@@ -425,7 +425,7 @@ class BombeRLeWorld(object):
 
     def end_round(self):
         # CHANGED
-        print('Entering World.end_round().')
+        # print('Entering World.end_round().')
         # END OF CHANGED
         if self.running:
             # Wait in case there is still a game step running
@@ -449,14 +449,14 @@ class BombeRLeWorld(object):
                     #self.current_round_actions = a.pipe.recv()
                     
                     agent_round_states = a.pipe.recv()
-                    print('After pipe, shape of current round states:',agent_round_states.shape)
+                    # print('After pipe, shape of current round states:',agent_round_states.shape)
                     if self.current_round_states is None:
                         self.current_round_states = agent_round_states
                     else:
                         self.current_round_states = np.concatenate((self.current_round_states, agent_round_states))
                     
                     agent_round_actions = a.pipe.recv()
-                    print('Length of current_round_actions:',len(agent_round_actions))
+                    # print('Length of current_round_actions:',len(agent_round_actions))
 
                     if self.current_round_actions is None:
                         self.current_round_actions = agent_round_actions

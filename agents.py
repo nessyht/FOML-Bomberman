@@ -195,13 +195,13 @@ class AgentProcess(mp.Process):
                     self.wlogger.exception(f'Error in callback function: {e}')
                 
                 # CHANGED KT - could be moved into end_of_episode code may be more elegant
-                print('State vector shape including two empty rows at end of round:',self.fake_self.state_vectors.shape)
+                # print('State vector shape:',self.fake_self.state_vectors.shape)
                 
                 
                 # Delete first reward which is added before any action is performed.
                 self.fake_self.rewards.pop(0)
                 
-                print('Number of steps survived:',len(self.fake_self.rewards))
+                # print('Number of steps survived:',len(self.fake_self.rewards))
                 # Add rewards for each step to states
                 self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array([self.fake_self.rewards]).T), axis = 1)
 
@@ -215,13 +215,13 @@ class AgentProcess(mp.Process):
                 total_rewards = np.ones((len(self.fake_self.rewards)))*np.sum(self.fake_self.rewards)
                 self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array([total_rewards]).T), axis = 1)
 
-                print('Pass data to self from fake_self:')
-                print('State vector shape of fakeself:',self.fake_self.state_vectors.shape)
+                # print('Pass data to self from fake_self:')
+                # print('State vector shape of fakeself:',self.fake_self.state_vectors.shape)
                 # This makes sure that e.g. self.rewards always contains only the data of a single round.
                 self.state_vectors = self.fake_self.state_vectors
                 self.rewards = self.fake_self.rewards
                 self.actions = self.fake_self.actions
-                print('After passing:\nShape of state vectors:',self.state_vectors.shape)
+                # print('After passing:\nShape of state vectors:',self.state_vectors.shape)
                 
                 # Send data through pipe
                 

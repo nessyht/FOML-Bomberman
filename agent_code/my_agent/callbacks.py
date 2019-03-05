@@ -8,9 +8,9 @@ def setup(self):
     np.random.seed()
     moves = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
     self.regressors = []
-    self.generation = 1 # Let this be externally fixed
+    self.generation = 0 # Let this be externally fixed
     for move in moves:
-        self.regressors.append(pickle.loads(open('Training_data/' + f'{self.generation:03}' + '_' + move + '.txt', 'wb')))
+        self.regressors.append(pickle.loads(open('agent_code/my_agent/Training_data/trees/' + f'{self.generation:03}' + '_' + move + '.txt', 'wb')))
         
 
 def MB_probs(rewards, T=100):
@@ -64,13 +64,63 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.3):
     
 def act(self):
     self.logger.info('Pick action from trees')
-
-
-    self.next_action = choose_action(regressors, create_state_vector(self), True)
+    
+    self.next_action = choose_action(self.regressors, create_state_vector(self), self.train_flag.is_set(), True)
     print(self.next_action)
     
-def reward_update(agent):
-    pass
+def reward_update(self):
+    """Called once per step to allow intermediate rewards based on game events.
 
-def end_of_episode(agent):
-    pass
+    When this method is called, self.events will contain a list of all game
+    events relevant to your agent that occured during the previous step. Consult
+    settings.py to see what events are tracked. You can hand out rewards to your
+    agent based on these events and your knowledge of the (new) game state. In
+    contrast to act, this method has no time limit.
+    """
+    
+    self.logger.debug(f'Encountered {len(self.events)} game event(s)')
+    
+    # what to do when interrupted or when round survived?
+    # CHANGED KT
+    reward = 0
+    for event in self.events:
+
+        if event == e.INVALID_ACTION:
+            reward = reward - 100
+        if event == e.CRATE_DESTROYED:
+            reward = reward + 10            
+        if event == e.COIN_COLLECTED:
+            reward = reward + 100
+        if event == e.KILLED_OPPONENT:
+            reward == reward + 500
+    
+    self.rewards.append(reward)
+    # CHANGED KT
+def end_of_episode(self):
+    """Called at the end of each game to hand out final rewards and do training.
+
+    This is similar to reward_update, except it is only called at the end of a
+    game. self.events will contain all events that occured during your agent's
+    final step. You should place your actual learning code in this method.
+    """
+    self.logger.debug(f'Encountered {len(self.events)} game event(s) in final step')
+
+    # CHANGED KT
+    reward = 0
+    for event in self.events:
+        
+        if event == e.GOT_KILLED:
+            reward = reward - 500
+        if event == e.KILLED_SELF:
+            reward = reward - 400
+        if event == e.INVALID_ACTION:
+            reward = reward - 100
+        if event == e.CRATE_DESTROYED:
+            reward = reward + 10            
+        if event == e.COIN_COLLECTED:
+            reward = reward + 100
+        if event == e.KILLED_OPPONENT:
+            reward == reward + 500
+    
+    self.rewards.append(reward)
+    # CHANGED KT
