@@ -38,7 +38,7 @@ def main():
               ('simple_agent', True),
               ('simple_agent', True)]
     
-    train_main(agents, 1000,[0])
+    train_main(agents, 1,[0])
     
 def train_main(agents, episodes, generations_list):
     '''
@@ -130,6 +130,8 @@ def train_main(agents, episodes, generations_list):
                 world.states = np.concatenate((world.states, world.current_round_states))            
                 # print('Shape of world states:', world.states.shape)
             world.actions.extend(world.current_round_actions)   
+            
+            print('Ending' + str(i) + 'of' + str(generation))
         
             # print('World States Shape:', world.states.shape)        
             # print('Length of world actions:', len(world.actions))         
@@ -151,9 +153,9 @@ def train_main(agents, episodes, generations_list):
         training(states[:,:-2], np.array(actions), states[:, -1], generation)
                
         pickle.dump([states, actions], open('agent_code/my_agent/Training_data/data/' + f'{generation:03}' + '_data.txt', 'wb')) # Store regressor in file e.g. 'UP.txt'
-
-        print('Time taken to gather training data for generation {generation} was:', time()-gen_time,
-              '\n Average episode time =', (time()-gen_time)/episodes)
+        print('States stored')
+        print('Time taken to gather training data for generation ' + str(generation) +   'was:', time()-gen_time,
+              '\nAverage episode time =', (time()-gen_time)/episodes)
         
         world.end()
     print('Total time taken was:', time()-start_time)
