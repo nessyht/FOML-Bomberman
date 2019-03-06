@@ -2,7 +2,7 @@
 import numpy as np
 import pickle
 from functions import create_state_vector
-
+from settings import e
 
 def setup(self):
     np.random.seed()
@@ -85,17 +85,34 @@ def reward_update(self):
     # what to do when interrupted or when round survived?
     # CHANGED KT
     reward = 0
-    for event in self.events:
+    for event1, event2 in self.events:
 
-        if event == e.INVALID_ACTION:
-            reward = reward - 100
-        if event == e.CRATE_DESTROYED:
-            reward = reward + 10            
-        if event == e.COIN_COLLECTED:
-            reward = reward + 100
-        if event == e.KILLED_OPPONENT:
-            reward == reward + 500
-    
+        if event1 == e.MOVED_LEFT:
+            reward -= 1
+        if event1 == e.MOVED_RIGHT:
+            reward -= 1
+        if event1 == e.MOVED_UP:
+            reward -= 1
+        if event1 == e.MOVED_DOWN:
+            reward -= 1
+        if event1 == e.MOVED_WAIT:
+            reward -= 10
+        if event1 == e.BOMB_DROPPED:
+            reward -= 1
+        if event1 == e.INVALID_ACTION:
+            reward -= 100
+        if event1 == e.CRATE_DESTROYED:
+            reward += 10            
+        if event1 == e.COIN_FOUND:
+            reward += 20
+        if event1 == e.BOMB_EXPLODED and not event2 == e.KILLED_SELF:
+            reward += 20
+        if event1 == e.COIN_COLLECTED:
+            reward += 100
+        if event1 == e.KILLED_OPPONENT:
+            reward += 500
+        
+        
     self.rewards.append(reward)
     # CHANGED KT
 def end_of_episode(self):
@@ -109,20 +126,40 @@ def end_of_episode(self):
 
     # CHANGED KT
     reward = 0
-    for event in self.events:
+    for event1, event2 in self.events:
         
-        if event == e.GOT_KILLED:
-            reward = reward - 500
-        if event == e.KILLED_SELF:
-            reward = reward - 400
-        if event == e.INVALID_ACTION:
-            reward = reward - 100
-        if event == e.CRATE_DESTROYED:
-            reward = reward + 10            
-        if event == e.COIN_COLLECTED:
-            reward = reward + 100
-        if event == e.KILLED_OPPONENT:
-            reward == reward + 500
+        if event1 == e.MOVED_LEFT:
+            reward -= 1
+        if event1 == e.MOVED_RIGHT:
+            reward -= 1
+        if event1 == e.MOVED_UP:
+            reward -= 1
+        if event1 == e.MOVED_DOWN:
+            reward -= 1
+        if event1 == e.MOVED_WAIT:
+            reward -= 10
+        if event1 == e.BOMB_DROPPED:
+            reward -= 1
+        if event1 == e.GOT_KILLED:
+            reward -= 500
+        if event1 == e.KILLED_SELF:
+            reward -= 400
+        if event1 == e.INVALID_ACTION:
+            reward -= 100
+        if event1 == e.CRATE_DESTROYED:
+            reward += 10            
+        if event1 == e.COIN_COLLECTED:
+            reward += 100
+        if event1 == e.CRATE_DESTROYED:
+            reward += 10            
+        if event1 == e.COIN_FOUND:
+            reward += 20
+        if event1 == e.BOMB_EXPLODED and not event2 == e.KILLED_SELF:
+            reward += 20
+        if event1 == e.COIN_COLLECTED:
+            reward += 100
+        if event1 == e.KILLED_OPPONENT:
+            reward += 500
     
     self.rewards.append(reward)
     # CHANGED KT
