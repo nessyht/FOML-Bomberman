@@ -33,13 +33,13 @@ def game_logic(world, user_inputs):
                     raise
 
 def main():
-    agents = [('my_agent', False),
+    agents = [('my_agent', True),
               ('simple_agent', False),
               ('simple_agent', False),
               ('simple_agent', False)]
     
-    #train_main(agents, 5,[1])
-    game_main(agents, 5, 0)
+    train_main(agents, 5,[0,1])
+    #game_main(agents, 5, 0)
     
 def train_main(agents, episodes, generations_list):
     '''
@@ -135,7 +135,7 @@ def train_main(agents, episodes, generations_list):
                 # print('Shape of world states:', world.states.shape)
             world.actions.extend(world.current_round_actions)   
             
-            print('Ending round ' + str(i) + ' of ' + str(episodes) + ' of generation ' + str(generation))
+            print('Ending round ' + str(i+1) + ' of ' + str(episodes) + ' of generation ' + str(generation))
         
             # print('World States Shape:', world.states.shape)        
             # print('Length of world actions:', len(world.actions))         
