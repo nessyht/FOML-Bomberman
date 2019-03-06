@@ -33,12 +33,13 @@ def game_logic(world, user_inputs):
                     raise
 
 def main():
-    agents = [('my_agent', True),
+    agents = [('my_agent', False),
               ('simple_agent', False),
               ('simple_agent', False),
               ('simple_agent', False)]
     
-    train_main(agents, 5,[0,1,2,3])
+    #train_main(agents, 5,[1])
+    game_main(agents, 5, 0)
     
 def train_main(agents, episodes, generations_list):
     '''
@@ -168,7 +169,7 @@ def train_main(agents, episodes, generations_list):
     # END OF CHANGED
 
 
-def game_main(agents, episodes, get_stats=False, save_replays=False):
+def game_main(agents, episodes, generation, get_stats=False, save_replays=False):
     '''
     agents: array of tuples of agent dir names and training flag
     episodes: number of episodes to be played
@@ -181,7 +182,7 @@ def game_main(agents, episodes, get_stats=False, save_replays=False):
     # mp.set_start_method('spawn')
 
     # Initialize environment and agents
-    world = BombeRLeWorld(agents)
+    world = BombeRLeWorld(agents, generation)
     
     # world = ReplayWorld('Replay 2019-01-30 16:57:42')
     user_inputs = []
@@ -192,7 +193,7 @@ def game_main(agents, episodes, get_stats=False, save_replays=False):
     t.start()
 
     # Run one or more games
-    for i in range(s.n_rounds):
+    for i in range(episodes):
         if not world.running:
             world.ready_for_restart_flag.wait()
             world.ready_for_restart_flag.clear()

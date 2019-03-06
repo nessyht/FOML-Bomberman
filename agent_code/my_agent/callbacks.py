@@ -2,14 +2,18 @@
 import numpy as np
 import pickle
 from functions import create_state_vector
-
+from settings import e
 
 def setup(self):
     np.random.seed()
     moves = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
     self.regressors = []
     #self.generation = 0 # Let this be externally fixed
-    generation = self.generation - 1
+    if self.train_flag.is_set():
+        generation = self.generation - 1
+    else:
+        generation = self.generation
+    
     print('Agent now training with generation ', generation)
     for move in moves:
         self.regressors.append(pickle.load(open('agent_code/my_agent/Training_data/trees/' + f'{generation:03}' + '_' + move + '.txt', 'rb')))
@@ -40,7 +44,7 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.25):
     # predict expected reward for each action
     for reg in regressor_list:
         predicted_reward.append(reg.predict(state.reshape(1, -1)))
-    
+        
     exploit = np.argmax(predicted_reward) # Index of action with highest reward
     
     if not exploring:
@@ -56,12 +60,11 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.25):
     
     if explore:
         # Remove highest reward from selection
-        actions.pop([exploit])
-        predicted_reward.pop([exploit])
+        actions.pop(exploit)
+        predicted_reward.pop(exploit)
         
         mean_reward_size = np.mean(np.abs(predicted_reward))
-        probabilities = MB_probs(predicted_reward, T=mean_reward_size)
-        
+        probabilities = MB_probs(predicted_reward, T=mean_reward_size).flatten()
         return np.random.choice(actions, p=probabilities)
     
 def act(self):
