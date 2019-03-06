@@ -85,32 +85,31 @@ def reward_update(self):
     # what to do when interrupted or when round survived?
     # CHANGED KT
     reward = 0
-    for event1, event2 in self.events:
-
-        if event1 == e.MOVED_LEFT:
-            reward -= 1
-        if event1 == e.MOVED_RIGHT:
-            reward -= 1
-        if event1 == e.MOVED_UP:
-            reward -= 1
-        if event1 == e.MOVED_DOWN:
-            reward -= 1
-        if event1 == e.MOVED_WAIT:
-            reward -= 10
-        if event1 == e.BOMB_DROPPED:
-            reward -= 1
-        if event1 == e.INVALID_ACTION:
-            reward -= 100
-        if event1 == e.CRATE_DESTROYED:
-            reward += 10            
-        if event1 == e.COIN_FOUND:
-            reward += 20
-        if event1 == e.BOMB_EXPLODED and not event2 == e.KILLED_SELF:
-            reward += 20
-        if event1 == e.COIN_COLLECTED:
-            reward += 100
-        if event1 == e.KILLED_OPPONENT:
-            reward += 500
+    
+    if e.MOVED_LEFT in self.events:
+        reward -= 1
+    if e.MOVED_RIGHT in self.events:
+        reward -= 1
+    if e.MOVED_UP in self.events:
+        reward -= 1
+    if e.MOVED_DOWN in self.events:
+        reward -= 1
+    if e.WAITED in self.events:
+        reward -= 10
+    if e.BOMB_DROPPED in self.events:
+        reward -= 1
+    if e.INVALID_ACTION in self.events:
+        reward -= 100
+    if e.CRATE_DESTROYED in self.events:
+        reward += 10            
+    if e.COIN_FOUND in self.events:
+        reward += 20
+    if e.BOMB_EXPLODED in self.events and not e.KILLED_SELF in self.events:
+        reward += 20
+    if e.COIN_COLLECTED in self.events:
+        reward += 100
+    if e.KILLED_OPPONENT in self.events:
+        reward += 500
         
         
     self.rewards.append(reward)
@@ -126,40 +125,34 @@ def end_of_episode(self):
 
     # CHANGED KT
     reward = 0
-    for event1, event2 in self.events:
-        
-        if event1 == e.MOVED_LEFT:
-            reward -= 1
-        if event1 == e.MOVED_RIGHT:
-            reward -= 1
-        if event1 == e.MOVED_UP:
-            reward -= 1
-        if event1 == e.MOVED_DOWN:
-            reward -= 1
-        if event1 == e.MOVED_WAIT:
-            reward -= 10
-        if event1 == e.BOMB_DROPPED:
-            reward -= 1
-        if event1 == e.GOT_KILLED:
-            reward -= 500
-        if event1 == e.KILLED_SELF:
-            reward -= 400
-        if event1 == e.INVALID_ACTION:
-            reward -= 100
-        if event1 == e.CRATE_DESTROYED:
-            reward += 10            
-        if event1 == e.COIN_COLLECTED:
-            reward += 100
-        if event1 == e.CRATE_DESTROYED:
-            reward += 10            
-        if event1 == e.COIN_FOUND:
-            reward += 20
-        if event1 == e.BOMB_EXPLODED and not event2 == e.KILLED_SELF:
-            reward += 20
-        if event1 == e.COIN_COLLECTED:
-            reward += 100
-        if event1 == e.KILLED_OPPONENT:
-            reward += 500
+    if e.MOVED_LEFT in self.events:
+        reward -= 1
+    if e.MOVED_RIGHT in self.events:
+        reward -= 1
+    if e.MOVED_UP in self.events:
+        reward -= 1
+    if e.MOVED_DOWN in self.events:
+        reward -= 1
+    if e.WAITED in self.events:
+        reward -= 10
+    if e.BOMB_DROPPED in self.events:
+        reward -= 1
+    if e.INVALID_ACTION in self.events:
+        reward -= 100
+    if e.CRATE_DESTROYED in self.events:
+        reward += 10            
+    if e.COIN_FOUND in self.events:
+        reward += 20
+    if e.BOMB_EXPLODED in self.events and not e.KILLED_SELF in self.events:
+        reward += 20
+    if e.COIN_COLLECTED in self.events:
+        reward += 100
+    if e.KILLED_OPPONENT in self.events:
+        reward += 500
+    if e.GOT_KILLED in self.events:
+        reward -= 500
+    if e.KILLED_SELF in self.events:
+        reward -= 400
     
     self.rewards.append(reward)
     # CHANGED KT
