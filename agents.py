@@ -53,7 +53,12 @@ class AgentProcess(mp.Process):
                 
         # Persistent 'self' object to pass to callback methods
         self.fake_self = SimpleNamespace(name=self.name)
-
+        
+        # CHANGED
+        self.fake_self.generation = self.generation
+        self.fake_self.train_flag = self.train_flag
+        # END OF CHANGED
+        
         # Set up individual loggers for the wrapper and the custom code
         self.wlogger = logging.getLogger(self.name + '_wrapper')
         self.wlogger.setLevel(s.log_agent_wrapper)
@@ -195,13 +200,13 @@ class AgentProcess(mp.Process):
                     self.wlogger.exception(f'Error in callback function: {e}')
                 
                 # CHANGED KT - could be moved into end_of_episode code may be more elegant
-                # print('State vector shape:',self.fake_self.state_vectors.shape)
+                print('State vector shape:',self.fake_self.state_vectors.shape)
                 
                 
                 # Delete first reward which is added before any action is performed.
                 self.fake_self.rewards.pop(0)
                 
-                # print('Number of steps survived:',len(self.fake_self.rewards))
+                print('Number of steps survived:',len(self.fake_self.rewards))
                 # Add rewards for each step to states
                 self.fake_self.state_vectors = np.concatenate((self.fake_self.state_vectors, np.array([self.fake_self.rewards]).T), axis = 1)
 

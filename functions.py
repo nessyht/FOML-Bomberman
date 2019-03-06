@@ -101,8 +101,8 @@ def create_state_vector(self):
 def training(states, actions, rewards, generation):
     """
     states: a flattened numpy array representing the occurred states
-    actions: a list of actions performed after respective state occurred
-    rewards: a list of rewards received after respective action was performed
+    actions: a list/numpy array of actions performed after respective state occurred
+    rewards: a list/numpy array of rewards received after respective action was performed
     generation: int, generation number
     """
     
@@ -123,9 +123,12 @@ def training(states, actions, rewards, generation):
         #regressor = MLPRegressor(max_iter=500) # Initialize MLP Regressor (Neural Network)
         
         print('Fitting ', f'{generation:03}', move) # Inform user about progress
+        
         # Fit regressor on respective states/rewards
         regressor.fit(states[actions==move], rewards[actions==move])
-        pickle.dump(regressor, open('agent_code/my_agent/Training_data/trees/' + f'{generation:03}' + '_' + move + '.txt', 'wb')) # Store regressor in file e.g. 'UP.txt'
+        
+         # Store regressor in file e.g. '000_UP.txt', '001_UP.txt', ...
+        pickle.dump(regressor, open('agent_code/my_agent/Training_data/trees/' + f'{generation:03}' + '_' + move + '.txt', 'wb'))
         
     print('Regressors stored.')
     
