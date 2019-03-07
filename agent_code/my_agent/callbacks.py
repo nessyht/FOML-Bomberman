@@ -163,7 +163,17 @@ def act(self):
     self.logger.info('Pick action from trees')
     
     self.next_action = choose_action(self.regressors, create_state_vector(self), exploring=self.train_flag.is_set())
-    print(self.next_action)
+    
+    arena = self.game_state['arena'].copy() 
+    x, y, _, bombs_left = self.game_state['self']
+    
+    invalid = False
+    if (self.next_action == 'UP' and arena[x,y-1] != 0) or (self.next_action == 'Down' and arena[x,y+1] != 0) or (self.next_action == 'LEFT' and arena[x-1,y] != 0) or (self.next_action == 'RIGHT' and arena[x+1,y] != 0) or (self.next_action == 'BOMB' and not bombs_left):
+        invalid = True
+                        
+    print(self.next_action, ('-Valid' if not invalid else '-Invalid'), '(', x, y, ')')
+    
+    
     
 def reward_update(self):
     """Called once per step to allow intermediate rewards based on game events.
