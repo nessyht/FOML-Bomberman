@@ -132,7 +132,6 @@ def end_of_episode(self):
 
     # CHANGED KT
     reward = 0
-    
     if e.MOVED_LEFT in self.events:
         reward -= 1
     if e.MOVED_RIGHT in self.events:
@@ -151,10 +150,16 @@ def end_of_episode(self):
         reward += 10            
     if e.COIN_FOUND in self.events:
         reward += 20
-    if (e.BOMB_EXPLODED in self.events) and not (e.KILLED_SELF in self.events):
-        reward += 50
+    if e.BOMB_EXPLODED in self.events and not e.KILLED_SELF in self.events:
+        reward += 20
     if e.COIN_COLLECTED in self.events:
-        reward += 2000
+        reward += 100
+    if e.KILLED_OPPONENT in self.events:
+        reward += 500
+    if e.GOT_KILLED in self.events:
+        reward -= 500
+    if e.KILLED_SELF in self.events:
+        reward -= 400
     if e.KILLED_OPPONENT in self.events:
         reward += 10000
     if e.GOT_KILLED in self.events:

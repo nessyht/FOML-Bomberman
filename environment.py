@@ -35,11 +35,12 @@ class BombeRLeWorld(object):
         
         self.states = None  # All states occurred during the season
         self.actions = [] # All actions chosen after respective state occurred
-        #self.rewards = [] # All cummulated rewards received after respective state occurred
+        self.statistics = [] # All cummulated rewards received after respective state occurred
         
         self.current_round_states = None
         self.current_round_actions = []
-        #self.current_round_rewards = []        
+        self.current_round_statistics = []        
+        
         
         
         # END OF CHANGED HES
@@ -459,21 +460,28 @@ class BombeRLeWorld(object):
                     #self.current_round_actions = a.pipe.recv()
                     
                     agent_round_states = a.pipe.recv()
+                    agent_round_actions = a.pipe.recv()
+                    # print('Length of current_round_actions:',len(agent_round_actions))
                     # print('After pipe, shape of current round states:',agent_round_states.shape)
+                    # END OF CHANGED HES
+                    # CHANGED KT
                     if self.current_round_states is None:
                         self.current_round_states = agent_round_states
                     else:
                         self.current_round_states = np.concatenate((self.current_round_states, agent_round_states))
-                    
-                    agent_round_actions = a.pipe.recv()
-                    # print('Length of current_round_actions:',len(agent_round_actions))
 
                     if self.current_round_actions is None:
                         self.current_round_actions = agent_round_actions
                     else:
                         self.current_round_actions = np.concatenate((self.current_round_actions, agent_round_actions))
-                    
-                    # END OF CHANGED HES
+                   
+                    stats = np.array([a.score, a.dead, self.agent_round_states[0,-1], a.mean_time, a.round, self.agent_round_states.shape[0]]).T
+                    if self.current_round_statistics is None:
+                        self.current_round_statistics = stats
+                    else:
+                        self.current_round_statistics = np.concatenate((self.current_round_statistics, stats), axis=1)
+                    # END CHANGED KT
+
                     
                     a.ready_flag.wait()
                     a.ready_flag.clear()
