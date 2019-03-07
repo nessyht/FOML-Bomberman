@@ -38,7 +38,7 @@ def main():
               ('simple_agent', False),
               ('simple_agent', False)]
    
-    train_main(agents, 5,[1,2])
+    train_main(agents, 10000, range(6,100))
     
 def train_main(agents, episodes, generations_list):
     '''
@@ -170,6 +170,11 @@ def train_main(agents, episodes, generations_list):
               '\nAverage episode time =', (time()-gen_time)/episodes)
         
         world.end()
+        
+        # CHANGED
+        del world
+        # END OF CHANGED
+        
     print('Total time taken was:', time()-start_time)
     # END OF CHANGED
 
@@ -251,6 +256,11 @@ def game_main(agents, episodes, generation, get_stats=False, save_replays=False)
                     last_frame = time()
 
     world.end()
-
+    
+    # CHANGED
+    del world
+    # END OF CHANGED
+        
+    
 if __name__ == '__main__':
     main()
