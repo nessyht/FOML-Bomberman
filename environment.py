@@ -30,7 +30,7 @@ class BombeRLeWorld(object):
         self.colors = ['blue', 'green', 'yellow', 'pink']
         self.setup_agents(agents)
 
-        # CHANGED HES:
+        # CHANGED
         # Add variables which collect training data; Will later be accessed by main.py:
         
         self.states = None  # All states occurred during the season
@@ -39,11 +39,11 @@ class BombeRLeWorld(object):
         
         self.current_round_states = None
         self.current_round_actions = []
-        self.current_round_statistics = []        
+        self.current_round_statistics = []  
         
         
         
-        # END OF CHANGED HES
+        # END CHANGED
         
         
         # Get the game going
@@ -474,12 +474,12 @@ class BombeRLeWorld(object):
                         self.current_round_actions = agent_round_actions
                     else:
                         self.current_round_actions = np.concatenate((self.current_round_actions, agent_round_actions))
-                   
-                    stats = np.array([a.score, a.dead, self.agent_round_states[0,-1], a.mean_time, a.round, self.agent_round_states.shape[0]]).T
-                    if self.current_round_statistics is None:
-                        self.current_round_statistics = stats
-                    else:
-                        self.current_round_statistics = np.concatenate((self.current_round_statistics, stats), axis=1)
+
+                    # stats = np.array({'name':a.name, 'score':a.score, 'alive':a.dead, 'reward':agent_round_states[0,-1], 'mean_time':a.mean_time, 'steps':agent_round_states.shape[0]}).T
+                    
+                    self.current_round_statistics.append({'name':a.name, 'score':a.score, 'alive':a.dead, 'reward':agent_round_states[0,-1], 'mean_time':a.mean_time, 'steps':agent_round_states.shape[0]})
+                    print(self.current_round_statistics, len(self.current_round_statistics))
+
                     # END CHANGED KT
 
                     

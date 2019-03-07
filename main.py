@@ -134,6 +134,8 @@ def train_main(agents, episodes, generations_list):
                 # print('Shape of world states:', world.states.shape)
             world.actions.extend(world.current_round_actions)   
             
+            print('Passing statistics')
+            
             if world.statistics is None:
                 world.statistics = world.current_round_statistics
             else:
