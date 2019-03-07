@@ -9,7 +9,11 @@ def setup(self):
     moves = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
     self.regressors = []
     #self.generation = 0 # Let this be externally fixed
-    generation = self.generation - 1
+    if self.train_flag.is_set():
+        generation = self.generation - 1
+    else:
+        generation = self.generation
+    
     print('Agent now training with generation ', generation)
     for move in moves:
         self.regressors.append(pickle.load(open('agent_code/my_agent/Training_data/trees/' + f'{generation:03}' + '_' + move + '.txt', 'rb')))
@@ -40,7 +44,7 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.25):
     # predict expected reward for each action
     for reg in regressor_list:
         predicted_reward.append(reg.predict(state.reshape(1, -1)))
-    
+        
     exploit = np.argmax(predicted_reward) # Index of action with highest reward
     
     if not exploring:
@@ -56,12 +60,11 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.25):
     
     if explore:
         # Remove highest reward from selection
-        actions.pop([exploit])
-        predicted_reward.pop([exploit])
+        actions.pop(exploit)
+        predicted_reward.pop(exploit)
         
         mean_reward_size = np.mean(np.abs(predicted_reward))
-        probabilities = MB_probs(predicted_reward, T=mean_reward_size)
-        
+        probabilities = MB_probs(predicted_reward, T=mean_reward_size).flatten()
         return np.random.choice(actions, p=probabilities)
     
 def act(self):
@@ -95,7 +98,7 @@ def reward_update(self):
     if e.MOVED_DOWN in self.events:
         reward -= 1
     if e.WAITED in self.events:
-        reward -= 10
+        reward -= 5
     if e.BOMB_DROPPED in self.events:
         reward -= 1
     if e.INVALID_ACTION in self.events:
@@ -104,16 +107,20 @@ def reward_update(self):
         reward += 10            
     if e.COIN_FOUND in self.events:
         reward += 20
-    if e.BOMB_EXPLODED in self.events and not e.KILLED_SELF in self.events:
-        reward += 20
+    if (e.BOMB_EXPLODED in self.events) and not (e.KILLED_SELF in self.events):
+        reward += 50
     if e.COIN_COLLECTED in self.events:
-        reward += 100
+        reward += 2000
     if e.KILLED_OPPONENT in self.events:
-        reward += 500
-        
+        reward += 10000
+    if e.GOT_KILLED in self.events:
+        reward -= 2000
+    if e.KILLED_SELF in self.events:
+        reward -= 1500
         
     self.rewards.append(reward)
     # CHANGED KT
+    
 def end_of_episode(self):
     """Called at the end of each game to hand out final rewards and do training.
 
@@ -134,7 +141,7 @@ def end_of_episode(self):
     if e.MOVED_DOWN in self.events:
         reward -= 1
     if e.WAITED in self.events:
-        reward -= 10
+        reward -= 5
     if e.BOMB_DROPPED in self.events:
         reward -= 1
     if e.INVALID_ACTION in self.events:
@@ -153,6 +160,12 @@ def end_of_episode(self):
         reward -= 500
     if e.KILLED_SELF in self.events:
         reward -= 400
-    
+    if e.KILLED_OPPONENT in self.events:
+        reward += 10000
+    if e.GOT_KILLED in self.events:
+        reward -= 2000
+    if e.KILLED_SELF in self.events:
+        reward -= 1500
+        
     self.rewards.append(reward)
     # CHANGED KT

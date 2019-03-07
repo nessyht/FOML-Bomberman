@@ -28,7 +28,7 @@ settings = {
     'actions': ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT'],
     'max_agents': 4,
     'max_steps': 400,
-    'stop_if_not_training': False,
+    'stop_if_not_training': True,
     'bomb_power': 3,
     'bomb_timer': 4,
     'explosion_timer': 2,
