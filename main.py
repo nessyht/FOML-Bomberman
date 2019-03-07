@@ -38,7 +38,7 @@ def main():
               ('simple_agent', False),
               ('simple_agent', False)]
    
-    train_main(agents, 5,[1])
+    train_main(agents, 5,[1,2])
     
 def train_main(agents, episodes, generations_list):
     '''
@@ -136,10 +136,7 @@ def train_main(agents, episodes, generations_list):
             
             print('Passing statistics')
             
-            if world.statistics is None:
-                world.statistics = world.current_round_statistics
-            else:
-                world.statistics = np.concatenate((world.statistics, world.current_round_statistics))
+            world.statistics.append(world.current_round_statistics)
                 
             print('Ending round ' + str(i+1) + ' of ' + str(episodes) + ' of generation ' + str(generation))
 
@@ -168,7 +165,7 @@ def train_main(agents, episodes, generations_list):
         # Store training data
         pickle.dump([states, actions], open('agent_code/my_agent/Training_data/data/' + f'{generation:03}' + '_data.txt', 'wb'))
         print('States stored')
-        pickle.dump(world.statistics.T, open('agent_code/my_agent/Training_data/statistics/' + f'{generation:03}' + '_statistics.txt', 'wb'))
+        pickle.dump(world.statistics, open('agent_code/my_agent/Training_data/statistics/' + f'{generation:03}' + '_statistics.txt', 'wb'))
         print('Time taken to gather training data for generation ' + str(generation) + ' was:', time()-gen_time,
               '\nAverage episode time =', (time()-gen_time)/episodes)
         

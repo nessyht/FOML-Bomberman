@@ -475,10 +475,9 @@ class BombeRLeWorld(object):
                     else:
                         self.current_round_actions = np.concatenate((self.current_round_actions, agent_round_actions))
 
-                    # stats = np.array({'name':a.name, 'score':a.score, 'alive':a.dead, 'reward':agent_round_states[0,-1], 'mean_time':a.mean_time, 'steps':agent_round_states.shape[0]}).T
                     
                     self.current_round_statistics.append({'name':a.name, 'score':a.score, 'alive':a.dead, 'reward':agent_round_states[0,-1], 'mean_time':a.mean_time, 'steps':agent_round_states.shape[0]})
-                    print(self.current_round_statistics, len(self.current_round_statistics))
+                    # print(self.current_round_statistics, len(self.current_round_statistics))
 
                     # END CHANGED KT
 

@@ -11,8 +11,7 @@ from pygame.transform import smoothscale
 import numpy as np
 from items import *
 from settings import s, e
-
-from functions import create_state_vector
+from agent_code.my_agent.callbacks import create_state_vector
 
 class IgnoreKeyboardInterrupt(object):
     """Context manager that protects enclosed code from Interrupt signals."""
