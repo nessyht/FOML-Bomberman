@@ -19,7 +19,9 @@ from settings import s, e
 
 class BombeRLeWorld(object):
 
-    def __init__(self, agents, generation):
+    def __init__(self, agents, generation, proc):
+
+        self.process = proc
         self.setup_logging()
         if s.gui:
             self.setup_gui()
@@ -56,7 +58,7 @@ class BombeRLeWorld(object):
     def setup_logging(self):
         self.logger = logging.getLogger('BombeRLeWorld')
         self.logger.setLevel(s.log_game)
-        handler = logging.FileHandler('logs/game.log', mode='w')
+        handler = logging.FileHandler('logs/' + 'game_' + str(self.process) + '.log', mode='w')
         handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s [%(name)s] %(levelname)s: %(message)s')
         handler.setFormatter(formatter)
@@ -462,7 +464,7 @@ class BombeRLeWorld(object):
                     agent_round_states = a.pipe.recv()
                     agent_round_actions = a.pipe.recv()
                     # print('Length of current_round_actions:',len(agent_round_actions))
-                    # print('After pipe, shape of current round states:',agent_round_states.shape)
+                    print('After pipe, shape of current round states:',agent_round_states.shape)
                     # END OF CHANGED HES
                     # CHANGED KT
                     if self.current_round_states is None:
@@ -490,7 +492,7 @@ class BombeRLeWorld(object):
                 slowest = max(self.agents, key=lambda a: a.mean_time)
                 self.logger.info(f'Agent <{slowest.name}> loses 1 point for being slowest (avg. {slowest.mean_time:.3f}s)')
                 slowest.update_score(s.reward_slow)
-                slowest.trophies.append(Agent.time_trophy)
+                slowest.trophies.append(self.time_trophy)
             # Save course of the game for future replay
             if s.save_replay:
                 self.replay['n_steps'] = self.step
@@ -504,11 +506,11 @@ class BombeRLeWorld(object):
 
         self.logger.debug('Setting ready_for_restart_flag')
         self.ready_for_restart_flag.set()
-
+        print('round ended for training agent in process' + str(self.process))
 
     def end(self):
         # CHANGED
-        print('Entering World.end().')
+        print('Ending round in world' + str(self.process))
         # END OF CHANGED
         if self.running:
             self.end_round()

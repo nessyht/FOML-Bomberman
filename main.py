@@ -59,7 +59,7 @@ def train_main(agents, episodes, generations_list, procs=1):
         pipe_list = []
         for i in range(procs):
             recv_end, send_end = mp.Pipe(False)
-            p = mp.Process(target=train_process, args=(agents, episodes/procs, generation, send_end))
+            p = mp.Process(target=train_process, args=(agents, episodes/procs, generation, send_end, i))
             worlds.append(p)
             pipe_list.append(recv_end)
             p.start()
@@ -93,7 +93,7 @@ def train_main(agents, episodes, generations_list, procs=1):
     print('Total time taken was:', time()-start_time)
     # END OF CHANGED
 
-def train_process(agents, episodes, generation, send_end):
+def train_process(agents, episodes, generation, send_end, proc):
     
         gen_time = time()
         
@@ -105,7 +105,7 @@ def train_process(agents, episodes, generation, send_end):
                     ('simple_agent', True)
                 ], generation)
         else:
-            world = BombeRLeWorld(agents, generation)
+            world = BombeRLeWorld(agents, generation, proc)
             
         # Pass generation to world in order to pass it to agents
         #world.generation = generation
