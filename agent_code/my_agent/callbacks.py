@@ -268,6 +268,13 @@ def end_of_episode(self):
         reward -= 2000
     if e.KILLED_SELF in self.events:
         reward -= 1500
-        
+    
+    Gamma = 0.9    
     self.rewards.append(reward)
+    rewards = np.array(self.rewards)
+    gammas = Gamma*np.arange(len(self.rewards))
+    
+    for y in range(rewards.shape[0]):
+        output.append(np.sum(rewards[y:]*gammas[:rewards.shape[0]-y]))
+    self.rewards = output
     # CHANGED KT
