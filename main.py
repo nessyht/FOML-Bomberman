@@ -38,7 +38,7 @@ def main():
               ('my_agent', True),
               ('my_agent', True)]
    
-    train_main(agents, 2500, [0])
+    train_main(agents, 2500, [4])
     
 def train_main(agents, episodes, generations_list):
     '''
