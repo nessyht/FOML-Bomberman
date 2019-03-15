@@ -34,11 +34,11 @@ def game_logic(world, user_inputs):
 
 def main():
     agents = [('my_agent', True),
-              ('simple_agent', False),
-              ('simple_agent', False),
-              ('simple_agent', False)]
+              ('my_agent', True),
+              ('my_agent', True),
+              ('my_agent', True)]
    
-    train_main(agents, 10000, range(6,100))
+    train_main(agents, 2500, [4])
     
 def train_main(agents, episodes, generations_list):
     '''
@@ -160,7 +160,7 @@ def train_main(agents, episodes, generations_list):
         # print('Shape of final rewards', states[:, -2].shape)
         
         # Train regressor
-        training(states[:,:-2], np.array(actions), states[:, -1], generation)
+        training(states[:,:-2], np.array(actions), states[:, -2], generation)
         
         # Store training data
         pickle.dump([states, actions], open('agent_code/my_agent/Training_data/data/' + f'{generation:03}' + '_data.txt', 'wb'))
