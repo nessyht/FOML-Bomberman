@@ -34,11 +34,11 @@ def game_logic(world, user_inputs):
 
 def main():
     agents = [('my_agent', True),
-              ('my_agent', True),
-              ('my_agent', True),
-              ('my_agent', True)]
+              ('simple_agent', False),
+              ('simple_agent', False),
+              ('simple_agent', False)]
    
-    train_main(agents, 2500, [4])
+    train_main(agents, 10000, [10, 11, 12])
     
 def train_main(agents, episodes, generations_list):
     '''
