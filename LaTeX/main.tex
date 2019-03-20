@@ -96,10 +96,31 @@ This section is divided into the three crucial tasks for which we needed to deve
 \end{itemize}
 
 	\subsection{State representation}
-	The first task was to choose a suitable state representation. In case of regressors provided by \textit{scikit-learn}, the training data is usually passed to the regressor as a 2D-array where each row (first index) represents a single state and each columns (second index) represents a feature of the respective states. Analagously, the prediction then demands an array of similar form. The regressor then returns an array with as many predicted values as there were rows (states) in the input array. If one wants to predict only a single value, one may not pass a 1D-array to the regressor but create an additional dummy dimension.\par
-	All this means that if we want to use precoded regressors from scikit-learn, we need to find a 1D-array representation for a single state. We chose to store the array in the following way:
+	The first task was to choose a suitable state representation. In case of regressors provided by \textit{scikit-learn}, the training data is usually passed to the regressor as a 2D-array where each row (first index) represents a single state and each column (second index) represents a feature of the respective states. Analagously, the prediction then demands an array of similar form. The regressor then returns an array with as many predicted values as there were rows (states) in the input array. If one wants to predict only a single value, one may not pass a 1D-array to the regressor but create an additional dummy dimension. All this means that if we want to use precoded regressors from scikit-learn, we need to find a 1D-array representation for a single state. \par
+	
+	After each step, the relevant data is passed to the agent via the dictionary \code{self.game\_state}. In the agents \code{callbacks.py} we defined the function \code{create\_state\_vector(\textit{self})} which turns the information provided by \code{self.game\_state} into a 1D-array. We chose to store the relevant features in the following way:
+	
 	\begin{itemize}
-		\item Include List here
+		\item For each cell:
+		\begin{itemize}
+			\item \textbf{Agent, Opponent, None \state{1,-1,0}}:\\
+			The dictionary provides the entry \code{self.game\_state['arena']} which is a 2D representation of the game board. We use this to create a numpy-array \code{agent\_state} of the same shape which is $1$ on the agents position, $-1$ on cells with an opponent and $0$ on all other cells.
+			\item \textbf{Crate, Coin, Empty/Wall \state{-1,1,0}}: \\
+			A copy of \code{self.game\_state['arena']} is manipulated in such a way that it is $-1$ for a crate, $1$ for a coin on the respective cell and $0$ in all other cases. This would mean that the agent could not distinguish between empty cells and walls. This issue is resolved later when we delete all cells which contain walls. These cells are always the same and therefore do not contribute to the learning process. In our code, this whole part is represented by the variable \code{loot\_state}.
+			\item \textbf{Bombs} \state{6,5 \dots 2,1,0}:\\
+			The variable \code{bomb\_state} is of the same shape as \code{self.game\_state['arena']}. All cells are by default $6$. If the cell will soon be affected by a bombs explosion, the values $5$ to $2$ represent the 4-time-steps countdown. $1$ and $0$ represent the 2-time-steps explosion. This way, \code{bomb\_state} provides a danger level for each cell. $6$ means no danger at all.
+			
+		\end{itemize}
+		\item Just once (implemented in our code as \code{extras}):
+		\begin{itemize}
+			\item \textbf{Current step number \state{1,\dots,400}}
+			\item \textbf{Bomb action possible \state{0,1}}
+			\item \textbf{Danger level:} This is a danger level for the agent. It is not necessary but provides a clearer measure of whether the agent is actually in danger. I propose to calculate this by multiplicating the danger level of each cell with the \textit{Cell contains agent} entry of each cell and then take the maximum of all the results. This way we will only get a non-zero value if the agent is on a cell with a danger level $>0$.
+			\item \textbf{Reward already received in this episode}
+			\item \textbf{Reward received at the end of the episode}: This one has to be added subsequently at the end of the episode to each ocurred state.
+			\item \textbf{Reward gained after this state occurred:} This one is the difference of the two above. This should be our \textit{target} which we aim to maximize.
+			\item \textbf{Agent touches opponent \state{0,1}}: The simple agents consider dropping a bomb if they touch an opponent. This may be a very good indicator for dropping a bomb for our model.
+		\end{itemize}
 	\end{itemize}
 
 	My proposal is a 2D numpy array. Each row (first index) represents a single state. Each column represents a feature. All available information is stored within each agent in the dictionary \code{self.game\_state}. What features do we store?
