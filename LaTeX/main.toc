@@ -1,21 +1,21 @@
 \select@language {english}
 \contentsline {section}{\numberline {1}Learning Method and Regression Model}{2}
 \contentsline {subsection}{\numberline {1.1}State representation}{2}
-\contentsline {subsection}{\numberline {1.2}Rewards}{5}
-\contentsline {subsection}{\numberline {1.3}Regressors}{5}
-\contentsline {section}{\numberline {2}Training Process}{5}
-\contentsline {section}{\numberline {3}Results}{5}
-\contentsline {section}{\numberline {4}Heins thoughts}{5}
-\contentsline {subsection}{\numberline {4.1}State representation}{5}
-\contentsline {subsection}{\numberline {4.2}Rewards}{7}
-\contentsline {subsection}{\numberline {4.3}Estimator}{7}
-\contentsline {subsection}{\numberline {4.4}Learning algorithm}{8}
-\contentsline {subsection}{\numberline {4.5}Necessary functions}{8}
-\contentsline {section}{\numberline {5}Karls thoughts}{9}
-\contentsline {subsection}{\numberline {5.1}Neural Networks}{10}
-\contentsline {subsection}{\numberline {5.2}Classical approach}{11}
-\contentsline {subsubsection}{State appraisal}{11}
-\contentsline {subsubsection}{Rewards}{12}
-\contentsline {subsubsection}{Exploration vs. Exploitation}{12}
-\contentsline {section}{\numberline {6}Karls observations}{13}
-\contentsline {subsection}{\numberline {6.1}The state matrix}{13}
+\contentsline {subsection}{\numberline {1.2}Rewards}{4}
+\contentsline {subsection}{\numberline {1.3}Regressors}{4}
+\contentsline {section}{\numberline {2}Training Process}{4}
+\contentsline {section}{\numberline {3}Results}{4}
+\contentsline {section}{\numberline {4}Heins thoughts}{4}
+\contentsline {subsection}{\numberline {4.1}State representation}{4}
+\contentsline {subsection}{\numberline {4.2}Rewards}{6}
+\contentsline {subsection}{\numberline {4.3}Estimator}{6}
+\contentsline {subsection}{\numberline {4.4}Learning algorithm}{7}
+\contentsline {subsection}{\numberline {4.5}Necessary functions}{7}
+\contentsline {section}{\numberline {5}Karls thoughts}{8}
+\contentsline {subsection}{\numberline {5.1}Neural Networks}{8}
+\contentsline {subsection}{\numberline {5.2}Classical approach}{9}
+\contentsline {subsubsection}{State appraisal}{10}
+\contentsline {subsubsection}{Rewards}{10}
+\contentsline {subsubsection}{Exploration vs. Exploitation}{11}
+\contentsline {section}{\numberline {6}Karls observations}{11}
+\contentsline {subsection}{\numberline {6.1}The state matrix}{12}
