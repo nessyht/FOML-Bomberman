@@ -37,6 +37,18 @@
 % displays code within text
 \newcommand{\code}[1]{{\fontfamily{pcr}\selectfont #1}}
 \newcommand{\state}[1]{$\left\lbrace #1 \right\rbrace$}
+
+% Define command \chapterauthor{author}
+\makeatletter
+\newcommand{\chapterauthor}[1]{%
+	{\parindent0pt\vspace*{-10pt}% Vspace btw heading and author
+		\linespread{1.1}\itshape#1 % \itshape is text formatting (italic) 
+		\par\nobreak\vspace*{10pt}} % Vspace btw author and text
+	\@afterheading%
+}
+\makeatother
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
@@ -85,7 +97,61 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \renewcommand{\thesection}{\arabic{section}}
-\chapter{Preliminaries}
+
+\section{Learning Method and Regression Model}
+\chapterauthor{Hein-Erik Schnell}
+This section is divided into the three crucial tasks for which we needed to develop a concept in order to get the agent into training. Those tasks were:
+
+\begin{itemize}
+	\item Choosing a suitable \textit{state representation} to be then passed to an \textit{regressor} to estimate the expected \textit{reward} for each of the possible actions
+	\item Choosing suitable \textit{rewards} in order to communicate the goals of the game to the agent
+	\item Choosing a suitable \textit{regressor} which estimates the expected \textit{reward} for each possible action at the current state of the game.
+\end{itemize}
+
+	\subsection{State representation}
+	\chapterauthor{Hein-Erik Schnell}
+	The first task was to choose a suitable state representation. In case of regressors provided by \textit{scikit-learn}, the training data is usually passed to the regressor as a 2D-array where each row (first index) represents a single state and each column (second index) represents a feature of the respective states. Analagously, the prediction then demands an array of similar form. The regressor then returns an array with as many predicted values as there were rows (states) in the input array. If one wants to predict only a single value, one may not pass a 1D-array to the regressor but create an additional dummy dimension. All this means that if we want to use precoded regressors from scikit-learn, we need to find a 1D-array representation for a single state. \par
+	
+	After each step, the relevant data is passed to the agent via the dictionary \code{self.game\_state}. In the agents \code{callbacks.py} we defined the function \code{create\_state\_vector(\textit{self})} which turns the information provided by \code{self.game\_state} into a 1D-array. We chose to store the relevant features in the following way:
+	
+	\begin{itemize}
+		\item For each cell:
+		\begin{itemize}
+			\item \textbf{Agent, Opponent, None \state{1,-1,0}}:\\
+			The dictionary provides the entry \code{self.game\_state['arena']} which is a 2D representation of the game board. We use this to create a numpy-array \code{agent\_state} of the same shape which is $1$ on the agents position, $-1$ on cells with an opponent and $0$ on all other cells.
+			\item \textbf{Crate, Coin, Empty/Wall \state{-1,1,0}}: \\
+			A copy of \code{self.game\_state['arena']} is manipulated in such a way that it is $-1$ for a crate, $1$ for a coin on the respective cell and $0$ in all other cases. This would mean that the agent could not distinguish between empty cells and walls. This issue is resolved later when we delete all cells which contain walls. These cells are always the same and therefore do not contribute to the learning process. In our code, this whole part is represented by the variable \code{loot\_state}.
+			\item \textbf{Bombs} \state{6,5 \dots 2,1,0}:\\
+			The variable \code{bomb\_state} is of the same shape as \code{self.game\_state['arena']}. All cells are by default $6$. If the cell will soon be affected by a bombs explosion, the values $5\dots2$ represent the 4-time-steps countdown. $1\dots0$ represent the 2-time-steps explosion. This way, \code{bomb\_state} provides a danger level for each cell. $6$ means no danger at all.
+			
+		\end{itemize}
+		\item Just once (implemented in our code as \code{extras}):
+		\begin{itemize}
+			\item \textbf{Current step number \state{1,\dots,400}}:\\
+			\code{extras[0]} contains the current time step.
+			\item \textbf{Danger level} \state{0,\dots,6}:\\
+			\code{extras[1]} represents the danger level on the agents current position. It is calculated by $6 - \text{\code{bomb\_state[x,y]}}$, where \code{x} and \code{y} are the coordinates of the agents position. Consequently, this danger level in invers to the danger level in \code{bomb\_state}, i.e. $0$ means no danger, $1\dots4$ means increasing danger and $5\dots6$ would be bombs exploding. The least point is rather irrelevant since the agent would already have been deleted by the environment.
+			\item \textbf{Bomb action possible \state{0,1}}:\\
+			\code{extras[2]} is $1$ if the agent could place a bomb and $0$ if not (i.e. if an own bomb is still ticking).
+			\item \textbf{Touching enemy} \state{0,1}:\\
+			\code{extras[3]} is $1$ if an opponent is on a neighbouring cell and $0$ if not.
+		\end{itemize}
+	\end{itemize}
+
+	After manipulating the data in the described way, all cells containing walls are deleted from the 2D-arrays \code{agent\_state}, \code{loot\_state} and \code{bomb\_state}. As already described above, this is done because these entries will always be the same and therefore never contribute to the learning of the agent. The three arrays are then flattened and concatenated after one another into the 1D-array \code{vector}. Finally, we append the \code{extras} to the \code{vector}, which is then returned by the function \code{create\_state\_vector}.
+	
+	\subsection{Rewards}
+	
+	
+	\subsection{Regressors}
+
+\section{Training Process}
+
+
+\section{Results}
+
+
+
 \section{Heins thoughts}
 Tasks to be done are:
 	\begin{itemize}
@@ -264,7 +330,6 @@ Importantly the values for rewards should be small to ensure numerical stability
 	[[learn to Tex maths]]
 \end{itemize}
 
-\chapter{Primary steps to create initial learning data}
 
 \section{Karls observations}
 
