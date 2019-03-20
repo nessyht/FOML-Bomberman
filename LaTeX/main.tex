@@ -37,6 +37,18 @@
 % displays code within text
 \newcommand{\code}[1]{{\fontfamily{pcr}\selectfont #1}}
 \newcommand{\state}[1]{$\left\lbrace #1 \right\rbrace$}
+
+% Define command \chapterauthor{author}
+\makeatletter
+\newcommand{\chapterauthor}[1]{%
+	{\parindent0pt\vspace*{-10pt}% Vspace btw heading and author
+		\linespread{1.1}\itshape#1 % \itshape is text formatting (italic) 
+		\par\nobreak\vspace*{10pt}} % Vspace btw author and text
+	\@afterheading%
+}
+\makeatother
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
@@ -87,6 +99,7 @@
 \renewcommand{\thesection}{\arabic{section}}
 
 \section{Learning Method and Regression Model}
+\chapterauthor{Hein-Erik Schnell}
 This section is divided into the three crucial tasks for which we needed to develop a concept in order to get the agent into training. Those tasks were:
 
 \begin{itemize}
@@ -96,6 +109,7 @@ This section is divided into the three crucial tasks for which we needed to deve
 \end{itemize}
 
 	\subsection{State representation}
+	\chapterauthor{Hein-Erik Schnell}
 	The first task was to choose a suitable state representation. In case of regressors provided by \textit{scikit-learn}, the training data is usually passed to the regressor as a 2D-array where each row (first index) represents a single state and each column (second index) represents a feature of the respective states. Analagously, the prediction then demands an array of similar form. The regressor then returns an array with as many predicted values as there were rows (states) in the input array. If one wants to predict only a single value, one may not pass a 1D-array to the regressor but create an additional dummy dimension. All this means that if we want to use precoded regressors from scikit-learn, we need to find a 1D-array representation for a single state. \par
 	
 	After each step, the relevant data is passed to the agent via the dictionary \code{self.game\_state}. In the agents \code{callbacks.py} we defined the function \code{create\_state\_vector(\textit{self})} which turns the information provided by \code{self.game\_state} into a 1D-array. We chose to store the relevant features in the following way:
