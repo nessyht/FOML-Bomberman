@@ -48,4 +48,21 @@ This section is divided into the three crucial tasks for which we needed to deve
 	\chapterauthor{Hein-Erik Schnell}
 	In order to estimate the expected rewards properly we need to find a regressor which is both flexible and very decisive with respect to the features. Flexible, because a simple linear regressor would not be able to resemble the volume of states and outcomes. This big variety of possible states, even at the very beginning of an episode, means that many features are not relevant in a given situation. This is the reason why the regressor should also be able to find the most decisive features.\par
 	
-	Since we will not know whether the competition will be split into two leagues, one for neural networks and one for classical regressors, 
+	Since we will not know whether the competition will be split into two leagues, one for neural networks and one for classical regressors, we initially decided to train both a classical regressor and a neural network and see which one performs better (in its respective league).\par
+	
+	As a classical model we chose to use a \textit{Random Forest Regressor}. The advantage of this regressor is that it is infinitely flexible can cope with whatever shape the reward function may assume. However, it turns out that this regressor is also quite inaccurate and erratic. Its erratic nature might be problematic because the order of the estimated rewards, i.e. which move is the best, is very important. If the order can not be predicted correctly the agent will not choose the best but only a good move. We chose to use the Random Forest Regressor provided by \textit{scikit-learn}.
+	
+	Figure \ref{forest_mlp_comp1} shows how much better the MLP-regressor performs compared to the Random Forest Regressor.
+
+	\begin{figure}[t]
+		\centering
+		\includegraphics[width=\linewidth]{images/mlp_forest_comparison01.png}
+		\caption{For this figure, \code{sklearn.datasets.make\_regression} was used to create $10000$ samples with $100$ features of which $10$ are informative. We then trained the Random Forest Regressor and the MLP-Regressor provided by \textit{scikit-learn} with $80\%$ of the generated data. The figure shows the predicted values of the remaining $20\%$ of the data which were used as a test set. The test set has previously been sorted by the true value in ascending order.}
+		\label{forest_mlp_comp1}
+	\end{figure}
+	\begin{figure}[t]
+		\centering
+		\includegraphics[width=\linewidth]{images/mlp_forest_comparison02.png}
+		\caption{For this figure, \code{sklearn.datasets.make\_regression} was used to create $10000$ samples with $100$ features of which $10$ are informative. We then trained the Random Forest Regressor and the MLP-Regressor provided by \textit{scikit-learn} with $80\%$ of the generated data. The figure shows the predicted values of the remaining $20\%$ of the data which were used as a test set. The test set has previously been sorted by the true value in ascending order.}
+		\label{forest_mlp_comp2}
+	\end{figure}
