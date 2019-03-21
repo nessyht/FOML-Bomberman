@@ -1,0 +1,29 @@
+\chapterauthor{Karl Thyssen}
+In reinforcement learning an agent is placed into an environment where it learns to interact with it dependent on the weighting of the 'trainer' on certain desired characteristics. This optimal policy is determined by the rewards the trainer supplies the agent with, which are based on the state of the environment at the time the agent is to make a decision. Through regular updates of the policy($\pi$) after receiving a reward for games played based on the current policy the agent will begin to favour actions it predicts will lead to higher rewards hence improve the policy and bring it as closely as possible to the optimum.
+
+Formally this is known as the Markov-Decision-Process where the state of the environment at a particular step t in the game is represented as \(s_t\) and the action taken for this time step t is represented as $a_t$. The current state is input into the current policy which leads the agent to select its next action. The action is selected from the action space \textbf{A} = \state{\text{UP}, \text{LEFT}, \text{DOWN}, \text{RIGHT}, \text{BOMB}, \text{WAIT}}. The reward for this action $r_t$ is then given by the reward function $r(s_t, a_t)$ given which the agent can then evaluate this move for the update of its policy. In Bomberman its simple to see that the state $s_t$ is given by the distribution of agents, loot, bombs, coins etc. in the game map represented as the trainer wishes. 
+
+In Bomberman an action can not be rewarded entirely isolated from the game as a whole as actions have direct repercussions least 6 steps into the future (by the time the explosion has dissipated) and even beyond. Therefore the action must be rewarded based on all future steps with those very far in the future having decreasing impact. Therefore we introduce a discount factor $\gamma \in [0, 1]$. We arbitrarily selected 0.9 to ensure the steps $n+4, n+5, n+6$ have a non-negligable impact on the reward, as these are the steps that we hope to cash in from a bomb and the agent should see that this was a well placed bomb if this is the case. Unfortunately we see this being very negative as the agent often self-destructs...
+
+Therefore the reward function that the agent is wishing to maximise the expected long term reward $E[\text{Reward}|\pi]$ for the optimal policy is: $$\text{Reward} = \sum_{t=0}^{\infty} \gamma^t r_{t+1}$$. 
+
+	\subsection{Q-Learning}
+	\chapterauthor{Karl Thyssen}
+	With our selected state vector of length 532 it would be highly impractical of not impossible to calculate the state action pairs for every state and the expected reward of each action due to the massive amount of data required for this along with the computationally intensive time requirement. Therefore we use the approach of Q-Learning to find the optimal Q function for each state-action pair in the data, updated using the discounted reward received for the action. We do this in the callback function of the agent when \code{end\_of\_episode()} is called, the discounted rewards are filled into the places of the previously stored immediate rewards of each state-action pair. 
+	
+	We store our Q-function as 6 random forest regressors; one for each action, from which the agent will choose an action based on the stochastic policy of the trained forests, each supplying the expected reward for the action it is trained for. This action $a_{t+1} = \pi(a_t|s_t)$ will, in training be mapped onto the calculated reward along with all state action pairs in the 10,000 games played during each particular policy iteration to retrain the forests, that is to say update the Q-function.
+	
+	\subsection{Exploration and exploitation}
+	\chapterauthor{Karl Thyssen}
+	While optimising the Q function based solely (exploitative approach) on the games of the previous generation (the trees trained on the past 10,000 games) it is possible to slip into a local maximum in terms of the yield which may well not be the optimal Q. Therefore we introduce a degree of exploration using an epsilon greedy policy in which we introduce a random action with the probability of $\epsilon \in [0,1]$. We select $\epsilon = 0.75$. Simply put, while learning, the policy selected for a particular state action pair is 
+	$$\pi(a_t|s_t) = \left\{
+		\begin{array}{ll}
+			argmax_{a \in A}Q(s_t,a)  & \mbox{if } x \geq \epsilon \\
+			a \in A & \mbox{if } x < \epsilon
+		\end{array}
+	\right.$$
+	with $x \in [0,1]$ selected at random at the time of the action decision being made.
+	
+	\subsection{Training data}
+	\chapterauthor{Karl Thyssen}
+	We generated new training data after each training generation of 10,000 games to train the new forests that is to say the Q function for the next generation to learn from. Therefore the size of our final training data array of action state vectors was dependent on the number of rounds the agent survived in a given generation. We saved each set of training data independently of each other to allow for training from any generation and later access to the data. The random forest regressors were also saved to allow for analysis of them and comparison between the generations by allowing play from any generation and even play against younger generation. Ideally play against younger generations would always lead to free wins as the agent should be significantly better after some time, however our agent is a lonely agent that rarely sees others anywhere other than in its state vectors.
