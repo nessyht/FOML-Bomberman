@@ -42,7 +42,19 @@ This section is divided into the three crucial tasks for which we needed to deve
 	With the described representation of a state we combined features which could be represented as seperate features into single features. For example in \cite{paper}, each cell has a feature \textit{Agent on cell?} and \textit{Opponent on cell?} which can both assume the values $0$ and $1$. We combined these two features. As we see it, a proper regressor should be able to determine the important features as well as the relevant range of values of a feature. A \textit{Random Forest Regressor}, for instance, should theoretically be able to do so since the way it works is to find the most relevant feature and its most divisive value.
 	
 	\subsection{Rewards}
-	
+	\chapterauthor{Karl Thyssen}
+	The individual rewards for events that occur in a given step contribute to the reward function and are explicitly defined in the \code{reward\_update()} and \code{end\_of\_episode} functions. The other parameter to influence is the discount factor $\gamma$ for the discounted long term reward. We ran training with factors $\gamma = 1.0$ and $\gamma = 0.9$. The reward function is describe by a series of if clauses that determine the quality of the action taken and apply the reward.
+\begin{itemize}
+	\item \textbf{Valid move}: $-1$ \\Every step is punished in a small way to encourage the agent to complete tasks in the shortest possible time to avoid stacking negative rewards.
+	\item \textbf{Wait}: $-5$\\We noticed while running preliminary quick trains that the agent quickly regressed into a pattern of repeated 'Waits' after only a few generations. Arguably other factors were also different at the time so its debatable how effective this now is.
+	\item \textbf{Invalid action}: $-100$\\Invalid actions should be punished so the agent quickly learns the connections in between the fields and the restrictions on the frequency of bomb placements.
+	\item \textbf{Destroy crate}: $+10$\\The agent should learn to destroy crates
+	\item \textbf{Coin found}: $+20$\\The agent should want to destroy as many crates as possible to find coins
+	\item \textbf{Collect coin}: $+100$\\The agent is heavily rewarded for finding coins to incentivise coin collection as a primary goal 
+	\item \textbf{Killed opponent}: $+10000$\\If the agent does accidentally kill an agent in training it should have a large weighting so this behaviour can be encouraged, particularly as this will be rare initially
+	\item \textbf{Die (from opponent bomb)}: $-2000$\\The agent should learn to avoid all bombs...
+	\item \textbf{Die (suicide)}: $-1500$\\...but rather die to its own to deny opponents 5 points.
+\end{itemize}	
 	
 	\subsection{Regressors}
 	\chapterauthor{Hein-Erik Schnell}

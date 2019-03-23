@@ -476,7 +476,6 @@ class BombeRLeWorld(object):
                         self.current_round_actions = np.concatenate((self.current_round_actions, agent_round_actions))
 
                     
-                    self.current_round_statistics.append({'name':a.name, 'score':a.score, 'alive':a.dead, 'reward':agent_round_states[0,-1], 'mean_time':a.mean_time, 'steps':agent_round_states.shape[0]})
                     # print(self.current_round_statistics, len(self.current_round_statistics))
 
                     # END CHANGED KT
@@ -484,8 +483,12 @@ class BombeRLeWorld(object):
                     
                     a.ready_flag.wait()
                     a.ready_flag.clear()
+                if a.name == 'my_agent':
+                    self.current_round_statistics.append({'name':a.name, 'score':a.score, 'alive':a.dead, 'reward':agent_round_states[0,-1], 'mean_time':a.mean_time, 'steps':agent_round_states.shape[0]})
+                
             # Penalty for agent who spent most time thinking
             if len(self.agents) > 1:
+                   
                 self.replay['times'] = [a.mean_time for a in self.agents]
                 slowest = max(self.agents, key=lambda a: a.mean_time)
                 self.logger.info(f'Agent <{slowest.name}> loses 1 point for being slowest (avg. {slowest.mean_time:.3f}s)')

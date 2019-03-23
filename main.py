@@ -34,11 +34,18 @@ def game_logic(world, user_inputs):
 
 def main():
     agents = [('my_agent', True),
+              ('my_agent', True),
+              ('my_agent', True),
+              ('my_agent', True)]
+   
+   
+    reagents = [('my_agent', True),
               ('simple_agent', False),
               ('simple_agent', False),
               ('simple_agent', False)]
-   
-    train_main(agents, 10000, [10, 11, 12])
+    gen = [13]
+    train_main(reagents, 1000, gen)
+    game_main(reagents, 100, gen[0], True, False)
     
 def train_main(agents, episodes, generations_list):
     '''
@@ -58,10 +65,10 @@ def train_main(agents, episodes, generations_list):
         
         if generation == 0:
             world = BombeRLeWorld([
-                    ('simple_agent', True),
-                    ('simple_agent', True),
-                    ('simple_agent', True),
-                    ('simple_agent', True)
+                    ('random_agent', True),
+                    ('random_agent', True),
+                    ('random_agent', True),
+                    ('random_agent', True)
                 ], generation)
         else:
             world = BombeRLeWorld(agents, generation)
@@ -254,10 +261,22 @@ def game_main(agents, episodes, generation, get_stats=False, save_replays=False)
                     sleep(sleep_time)
                 if not s.gui:
                     last_frame = time()
+                    
+        if get_stats:
+            if world.states is None:
+                world.states = world.current_round_states
+            else:
+                world.states = np.concatenate((world.states, world.current_round_states))            
+                # print('Shape of world states:', world.states.shape)
+            world.actions.extend(world.current_round_actions)  
+            
+            world.statistics.append(world.current_round_statistics)
+
+    if get_stats:
+        pickle.dump(world.statistics, open('agent_code/my_agent/Training_data/statistics/' + f'{generation:03}' + '_statistics.txt', 'wb'))
+    # CHANGED
 
     world.end()
-    
-    # CHANGED
     del world
     # END OF CHANGED
         

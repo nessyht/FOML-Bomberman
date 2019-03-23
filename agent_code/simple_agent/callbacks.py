@@ -290,13 +290,7 @@ def end_of_episode(self):
     if e.BOMB_EXPLODED in self.events and not e.KILLED_SELF in self.events:
         reward += 20
     if e.COIN_COLLECTED in self.events:
-        reward += 100
-    if e.KILLED_OPPONENT in self.events:
-        reward += 500
-    if e.GOT_KILLED in self.events:
-        reward -= 500
-    if e.KILLED_SELF in self.events:
-        reward -= 400
+        reward += 2000
     if e.KILLED_OPPONENT in self.events:
         reward += 10000
     if e.GOT_KILLED in self.events:
@@ -309,6 +303,7 @@ def end_of_episode(self):
     rewards = np.array(self.rewards)
     gammas = Gamma*np.arange(len(self.rewards))
     
+    output = []
     for y in range(rewards.shape[0]):
         output.append(np.sum(rewards[y:]*gammas[:rewards.shape[0]-y]))
     self.rewards = output
