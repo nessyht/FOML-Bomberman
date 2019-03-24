@@ -161,8 +161,11 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.25):
     
 def act(self):
     self.logger.info('Pick action from trees')
-    
-    self.next_action = choose_action(self.regressors, create_state_vector(self), exploring=self.train_flag.is_set())
+    explore = False
+    if self.train_flag.is_set():  
+        explore = np.random.choice([True, False], p=[0.25, 0.75])
+  
+    self.next_action = choose_action(self.regressors, create_state_vector(self), exploring=explore)#self.train_flag.is_set())
     
     arena = self.game_state['arena'].copy() 
     x, y, _, bombs_left = self.game_state['self']
@@ -210,7 +213,7 @@ def reward_update(self):
     if e.COIN_FOUND in self.events:
         reward += 20
     if (e.BOMB_EXPLODED in self.events) and not (e.KILLED_SELF in self.events):
-        reward += 50
+        reward += 500
     if e.COIN_COLLECTED in self.events:
         reward += 2000
     if e.KILLED_OPPONENT in self.events:
@@ -253,15 +256,9 @@ def end_of_episode(self):
     if e.COIN_FOUND in self.events:
         reward += 20
     if e.BOMB_EXPLODED in self.events and not e.KILLED_SELF in self.events:
-        reward += 20
-    if e.COIN_COLLECTED in self.events:
-        reward += 100
-    if e.KILLED_OPPONENT in self.events:
         reward += 500
-    if e.GOT_KILLED in self.events:
-        reward -= 500
-    if e.KILLED_SELF in self.events:
-        reward -= 400
+    if e.COIN_COLLECTED in self.events:
+        reward += 2000
     if e.KILLED_OPPONENT in self.events:
         reward += 10000
     if e.GOT_KILLED in self.events:
