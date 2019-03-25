@@ -162,8 +162,8 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.25):
 def act(self):
     self.logger.info('Pick action from trees')
     explore = False
-    #if self.train_flag.is_set():  
-    #    explore = np.random.choice([True, False], p=[0.25, 0.75])
+    if self.train_flag.is_set():  
+        explore = np.random.choice([True, False], p=[0.25, 0.75])
   
     self.next_action = choose_action(self.regressors, create_state_vector(self), exploring=explore)#self.train_flag.is_set())
     

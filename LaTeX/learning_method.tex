@@ -14,6 +14,7 @@ This section is divided into the three crucial tasks for which we needed to deve
 	After each step, the relevant data is passed to the agent via the dictionary \code{self.game\_state}. In the agents \code{callbacks.py} we defined the function \code{create\_state\_vector(\textit{self})} which turns the information provided by \code{self.game\_state} into a 1D-array. We chose to store the relevant features in the following way:
 	
 	\subsubsection{State representation 1}
+	\label{State_rep_1}
 	\begin{itemize}
 		\item For each cell:
 		\begin{itemize}
@@ -46,6 +47,7 @@ This section is divided into the three crucial tasks for which we needed to deve
 	% Calculated with 3^(17*17-34-30-49) * 3^(17*17-34-30-49) * 7^(17*17-34-30-49)*400*7*2*2
 	
 	\subsubsection{State representation 2}
+	\label{State_rep_2}
 	As described later in section \ref{results}, our agent never managed to get out of its starting corner. In order to change that, we condensed the above state vector ($532$ features) into a much smaller state vector of $180$ features. The main idea of this smaller state vector is that agents, opponents, crates and coins can never occupy the same cell. Bombs could occupy the same cell as agents, opponents or coins, but for the sake of the agent they shouldn't:
 	
 	\begin{itemize}
@@ -79,7 +81,7 @@ This section is divided into the three crucial tasks for which we needed to deve
 	\item \textbf{Invalid action}: $-100$\\Invalid actions should be punished so the agent quickly learns the connections in between the fields and the restrictions on the frequency of bomb placements.
 	\item \textbf{Destroy crate}: $+10$\\The agent should learn to destroy crates
 	\item \textbf{Coin found}: $+20$\\The agent should want to destroy as many crates as possible to find coins
-	\item \textbf{Collect coin}: $+100$\\The agent is heavily rewarded for finding coins to incentivise coin collection as a primary goal 
+	\item \textbf{Collect coin}: $+2000$\\The agent is heavily rewarded for finding coins to incentivise coin collection as a primary goal 
 	\item \textbf{Killed opponent}: $+10000$\\If the agent does accidentally kill an agent in training it should have a large weighting so this behaviour can be encouraged, particularly as this will be rare initially
 	\item \textbf{Die (from opponent bomb)}: $-2000$\\The agent should learn to avoid all bombs...
 	\item \textbf{Die (suicide)}: $-1500$\\...but rather die to its own to deny opponents 5 points.

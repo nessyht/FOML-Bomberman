@@ -14,6 +14,7 @@ Therefore the reward function that the agent is wishing to maximise the expected
 	We store our Q-function as 6 random forest regressors; one for each action, from which the agent will choose an action based on the stochastic policy of the trained forests, each supplying the expected reward for the action it is trained for. This action $a_{t+1} = \pi(a_t|s_t)$ will, in training be mapped onto the calculated reward along with all state action pairs in the 10,000 games played during each particular policy iteration to retrain the forests, that is to say update the Q-function.
 	
 	\subsection{Exploration and exploitation}
+	\label{explo}
 	\chapterauthor{Karl Thyssen}
 	While optimising the Q function based solely (exploitative approach) on the games of the previous generation (the trees trained on the past 10,000 games) it is possible to slip into a local maximum in terms of the yield which may well not be the optimal Q. Therefore we introduce a degree of exploration using an epsilon greedy policy in which we introduce a random action with the probability of $\epsilon \in [0,1]$. We select $\epsilon = 0.75$. Simply put, while learning, the policy selected for a particular state action pair is 
 	$$\pi(a_t|s_t) = \left\{
