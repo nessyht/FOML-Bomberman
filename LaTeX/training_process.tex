@@ -37,6 +37,8 @@ Therefore the reward function that the agent is wishing to maximise the expected
 	\caption{\textit{Exemplary table of expected rewards $Q(s,a)$ and corresponding probabilities $\pi (s,a)$ if $T$ is chosen as described above. In this case: $T=30.4$}}
 	\label{MB_table}
 	\end{figure}
+	We later decided to enable \textit{exploration} only in one fourth of all rounds. The reason is that the agent can only survive after it placed a bomb if it moves consistently away from it or around a corner. Thus, a random move in every fourth step may be fatal. With the above measure, we could at least ensure the survival after placing a bomb and make the agent learn this behaviour.
+	
 	\subsection{Training data}
 	\chapterauthor{Karl Thyssen}
 	We generated new training data after each training generation of 10,000 games to train the new forests that is to say the Q function for the next generation to learn from. Therefore the size of our final training data array of action state vectors was dependent on the number of rounds the agent survived in a given generation. We saved each set of training data independently of each other to allow for training from any generation and later access to the data. The random forest regressors were also saved to allow for analysis of them and comparison between the generations by allowing play from any generation and even play against younger generation. Ideally play against younger generations would always lead to free wins as the agent should be significantly better after some time, however our agent is a lonely agent that rarely sees others anywhere other than in its state vectors.

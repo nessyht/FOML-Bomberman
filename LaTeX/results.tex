@@ -51,12 +51,14 @@ The average time required to generate data for and fit each generation was rough
 %discuss changes and possible solutions - even fewer features, other machine learning methods
 
 \subsection{Outlook}
+\chapterauthor{Hein-Erik Schnell, Karl Thyssen}
 As discussed in the previous subsection, our agents are very unsuccessful. They mostly remain in their starting corner and more often than not they blow themselves up. It is therefore necessary to discuss alternative approaches to the task and how we could have improved our implemented approaches.\par
 
 % More time, maybe they would have learned then -> more episodes per generation, more generations in general
 % Exploration/Exploitation
 % Much smaller state vector, no representation of the whole board
 % Different initial settings of regressors
+% Update regressors, not refit
 % Different reward scheme, other gamma
 
 As we see it, the topics to be discussed are mostly the sections above:
@@ -67,4 +69,27 @@ As we see it, the topics to be discussed are mostly the sections above:
 	\item Training procedure
 	\item Exploration / Exploitation
 \end{itemize}
-First of all, assuming that 
+
+\subsubsection{State Representation}
+With what we saw so far, we have to assume that less features in the state vector lead to far less possible states and better performance of the agent. The $180$-features version of the state vector is already close to the smallest form of state vector possible if we want to represent the whole game board, which would be at least $176$ features ($176$ accessible cells). \par
+A possible improvement would be a state vector which does not represent the whole game board. The simple agents, for example, only know the position of possible targets and whether they are in danger. With this in mind, we could create a state vector which gives only the informations relevant to the simple agents. Given that in most cases most of the game board is not relevant (especially at the beginning of an episode), this seems to be a quite reasonable approach. It would also help the agent to prioritize certain features, e.g. avoid explosions before collecting coins.
+
+\subsubsection{Reward Scheme}
+In the plots above, we see that achieved scores and rewards hardly correlate. In the ideal case, higher score means more rewards. Since this is not the case, we need to revisit our reward scheme and distribute much higher rewards for what actually scores. On the other hand, our agent died a lot which meant lots of penalties. But we don't get negative scores for dying. We don't really know which way is better and we would have tried both ways in order to find out.
+
+\subsubsection{Regressors}
+The regressors were the third crucial design choice. As hinted above, choosing a regressor which is very erratic (Random Forest Regressor) and one which we don't know much about (MLP-Regressor) left us somewhat dissatisfied. Still, they were the most practical choices to us.\par
+For both regressors we used almost the default settings. Adjusting those settings accordingly to our task might have helped a lot. But in the case of the MLP-Regressor, we could only guess what effects the various parameters might have. \par
+
+All in all, choosing a better suited regressor and adjusting its parameters properly are two of the most important tasks in order to improve our model.\par
+
+One should also mention that, after each generation, we fitted a whole new Forest. One could try to adjust the former Forest towards the data, instead.
+
+\subsubsection{Training procedure}
+We mostly trained our model with $10000$ episodes per generation. In one case even for more than $40$ generations (i.e. $400000$ episodes). Since Reinforcement Learning sometimes requires long times before encountering a good policy, we could never know whether our agent is not able to learn properly (because of the points above) or if it just didn't have enough time. With almost no experience from prior projects or exercises concerning RL, we didn't know how to find out which is the case. Speaking of only the training procedure, having more episodes per generation and letting it run for more generations might always improve the results.
+
+\subsubsection{Exploration / Exploitation}
+As mentioned before, the agent tends to kill itself if \textit{exploration} is enabled because it is likely to take random actions shortly after having placed a bomb. In order to prevent this, one could lower the $\epsilon$ significantly. Apart from that, we think that \textit{exploration/exploitation} is of less importance in terms of improving the model. The bottleneck are the points mentioned in \textit{State Representation, Reward Scheme} and \textit{Regressors}. 
+
+\subsection{Further Comments on the final project}
+As already implied in several parts of the report, our greatest issue was the lack of knowledge and experience with Reinforcement Learning. Some exercises with feedback and sample solutions would have helped a lot. For the next time, I propose to divide the final project into subtasks which are then given to the students as the final one or two exercise sheets and let the final project be something like the final improvements to an already working environment and model.
