@@ -263,15 +263,9 @@ def end_of_episode(self):
     if e.COIN_FOUND in self.events:
         reward += 20
     if e.BOMB_EXPLODED in self.events and not e.KILLED_SELF in self.events:
-        reward += 20
+        reward += 50
     if e.COIN_COLLECTED in self.events:
-        reward += 100
-    if e.KILLED_OPPONENT in self.events:
-        reward += 500
-    if e.GOT_KILLED in self.events:
-        reward -= 500
-    if e.KILLED_SELF in self.events:
-        reward -= 400
+        reward += 2000
     if e.KILLED_OPPONENT in self.events:
         reward += 10000
     if e.GOT_KILLED in self.events:

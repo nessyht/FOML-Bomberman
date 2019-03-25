@@ -43,9 +43,9 @@ def main():
               ('simple_agent', False),
               ('simple_agent', False),
               ('simple_agent', False)]
-    gen = [13]
-    train_main(reagents, 1000, gen)
-    game_main(reagents, 100, gen[0], True, False)
+    gen = [14]
+    train_main(reagents, 10000, gen)
+    #game_main(reagents, 100, gen[0]+1, True, False)
     
 def train_main(agents, episodes, generations_list):
     '''
@@ -273,7 +273,7 @@ def game_main(agents, episodes, generation, get_stats=False, save_replays=False)
             world.statistics.append(world.current_round_statistics)
 
     if get_stats:
-        pickle.dump(world.statistics, open('agent_code/my_agent/Training_data/statistics/' + f'{generation:03}' + '_statistics.txt', 'wb'))
+        pickle.dump(world.statistics, open('agent_code/my_agent/Training_data/statistics/' + f'{generation-1:03}' + '_statistics.txt', 'wb'))
     # CHANGED
 
     world.end()
