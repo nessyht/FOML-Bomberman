@@ -35,10 +35,9 @@ def create_state_vector(self):
      bomb or explosion present: 5 for none, t for timer]
     '''
     agent_state = np.zeros((arena.shape))
-    
     #loot_state = np.zeros((arena.shape))
     #bomb_state = np.zeros((arena.shape))
-    
+
     x, y, _, bombs_left = self.game_state['self']
     bombs = self.game_state['bombs'].copy()
     others = [(x,y) for (x,y,n,b) in self.game_state['others']]
@@ -46,25 +45,24 @@ def create_state_vector(self):
     step = self.game_state['step']
     explosions = self.game_state['explosions'].copy()
     
-    
     # May need to be extended dependent on the changes in state definition
     extras = np.zeros((4))
     
     # For every cell: 
 
-    # Agent on cell: 1
+    # Agent on cell, self
     agent_state[x, y] = 1
     
-    # Opponent on cell: 2
+    # Agent on cell, enemy
     for o in others:
-        agent_state[o[0], o[1]] = 2
+        agent_state[o[0], o[1]] = -1
         
-    # Crate on cell: 3 
-    agent_state += np.where(arena == 1, 3, 0)
+    # Crate on cell? 
+    loot_state = np.where(arena == 1, -1, 0)
             
-    # Coin on cell: 4
+    # Coin on cell?
     for coin in coins:
-        agent_state[coin[0], coin[1]] = 4
+        loot_state[coin[0], coin[1]] = 1
     
     # Bomb radius on cell?    
     bomb_state = np.ones(arena.shape) * 6
@@ -73,42 +71,37 @@ def create_state_vector(self):
         for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
             if (0 < i < bomb_state.shape[0]) and (0 < j < bomb_state.shape[1]):
                 bomb_state[i,j] = min(bomb_state[i,j], t)
-                
-    # Exlosions on cell?      
+    # Danger level
+    extras[1] = 6 - bomb_state[x, y]
+                    
+    # Exlosions on cell?
+      
     bomb_state[np.where(explosions == 1)] = 0
     bomb_state[np.where(explosions == 2)] = 1
-    
-    bomb_state = 11 - bomb_state 
-    # 6 - bomb_state + 5 because values 0 to 4 have other meanings in agent_state
-    
-    
-    
-    # Overwrite values of dangerous cells; 5 in bomb_state means no danger
-    # -> stored values are 6 to 11
-    # -> 5 is still without meaning
-    agent_state[bomb_state != 5] = bomb_state[bomb_state != 5]
-    
-    # Danger level
-    extras[0] = bomb_state[x, y]
+
+    # Only once:
+    # Current step
+    extras[0] = step
     
 
     # Bomb action possible?
-    extras[1] = bombs_left
+    extras[2] = bombs_left
     
     # Touching enemy
     if len(others) > 0:
         if (min(abs(xy[0] - x) + abs(xy[1] - y) for xy in others)) <= 1:
-            extras[2] = 1
+            extras[3] = 1
     
-    # Position of agent:
-    extras[3] = 17*x + y
     # Reward for step (later)
     
     # Reward for episode (added later)
     
-    agent_state = agent_state.flatten()
-    
-    state = agent_state[(arena != -1).flatten()]
+    # State of each cell
+    # combine state maps and flatten into 1D-array
+    state = np.stack((agent_state[arena != -1].flatten(), \
+                      loot_state[arena != -1].flatten(), \
+                      bomb_state[arena != -1].flatten()), \
+                      axis=-1).flatten()
     
     vector = np.concatenate((state, extras)) # combine extras and state vector
     #print('Shape of a single state vector:',vector.shape)
@@ -168,11 +161,11 @@ def choose_action(regressor_list, state, exploring=False, epsilon=0.25):
     
 def act(self):
     self.logger.info('Pick action from trees')
-    
     explore = False
-    if self.train_flag.is_set():  
-        explore = np.random.choice([True, False], p=[0.25, 0.75])
-    self.next_action = choose_action(self.regressors, create_state_vector(self), exploring=explore)  
+    #if self.train_flag.is_set():  
+    #    explore = np.random.choice([True, False], p=[0.25, 0.75])
+  
+    self.next_action = choose_action(self.regressors, create_state_vector(self), exploring=explore)#self.train_flag.is_set())
     
     arena = self.game_state['arena'].copy() 
     x, y, _, bombs_left = self.game_state['self']
@@ -220,7 +213,7 @@ def reward_update(self):
     if e.COIN_FOUND in self.events:
         reward += 20
     if (e.BOMB_EXPLODED in self.events) and not (e.KILLED_SELF in self.events):
-        reward += 50
+        reward += 500
     if e.COIN_COLLECTED in self.events:
         reward += 2000
     if e.KILLED_OPPONENT in self.events:
@@ -263,15 +256,9 @@ def end_of_episode(self):
     if e.COIN_FOUND in self.events:
         reward += 20
     if e.BOMB_EXPLODED in self.events and not e.KILLED_SELF in self.events:
-        reward += 20
-    if e.COIN_COLLECTED in self.events:
-        reward += 100
-    if e.KILLED_OPPONENT in self.events:
         reward += 500
-    if e.GOT_KILLED in self.events:
-        reward -= 500
-    if e.KILLED_SELF in self.events:
-        reward -= 400
+    if e.COIN_COLLECTED in self.events:
+        reward += 2000
     if e.KILLED_OPPONENT in self.events:
         reward += 10000
     if e.GOT_KILLED in self.events:
