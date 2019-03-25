@@ -2,9 +2,9 @@
 \chapterauthor{Karl Thyssen}
 Here we will discuss the results we saw for the various approaches we attempted.
 
-To gather statistics all bots played $100$ games vs. $3$ \code{simple\_agents} and the results were then averages over all games.
+To gather, statistics all bots played $100$ games against $3$ \code{simple\_agents} and the results were then averaged over all games.
 
-As previously mentioned we experimented with a $\gamma$ value of $1.0$ and $0.9$ after which we continued other variations at $\gamma = 0.9$.
+As previously mentioned, we experimented with a $\gamma$ value of $1.0$ and $0.9$ after which we continued other variations at $\gamma = 0.9$.
 Other variations include:
 \begin{itemize}
 	\item $\gamma = 1.0$:
@@ -28,30 +28,30 @@ Other variations include:
 %Discuss reasons behind initial approach - also mlp regressor (slow to fit so less data)
 \subsection{The initial approach}
 \chapterauthor{Karl Thyssen}
-Having decided on the random forest regressors as the medium for storing our Q, and knowing the random forest has the ability to determine feature importances and weightings itself we decided to throw every feature we could think of at it as described using \ref{State_rep_1}. We initially also chose a $\gamma$ value of $1.0$ for simplicity in testing and began to train an agent. In \cite{paper} the agent trains for 10000 episodes per generation and begins to show a large improvement between generations $0$ and $20$, however that agent is trained using a neural network so we expected a longer wait before seeing such spikes in performance. This is due to the erratic nature of the predictions made by the forests in relation to the MLP we tested.
+Having decided on the random forest regressors as the medium for storing our Q, and knowing the random forest has the ability to determine feature importances and weightings itself, we decided to throw every feature we could think of at it as described in \ref{State_rep_1}. We initially also chose a $\gamma$ value of $1.0$ for simplicity in testing and began to train an agent. In \cite{paper}, the agent trains for 10000 episodes per generation and begins to show a large improvement between generations $0$ and $20$. However, that agent is trained using a neural network so we expected a longer wait before seeing such spikes in performance. This is due to the erratic nature of the predictions made by the forests in relation to the MLP we tested.
 
-Out of interest we also tested the same set-up using an MLP regressor, however unlike the forest, the impact of using any and all features was an exorbitant time required for the fitting after each generation, often longer than the data generation itself.
+Out of interest we also tested the same set-up using an MLP regressor. However, unlike the forest the impact of using any and all features was an exorbitant time required for the fitting after each generation, often longer than the data generation itself.
 
-The time required to generate data for and fit each generation was between $4800$ and $10000$ seconds for the random forest. This time required is clearly dependent not only on hardware and thinking time but also the number of steps the agent takes per episode which was, unfortunately, consistently short.
+The time required to generate data and fit each generation was between $4800$ and $10000$ seconds for the random forest. This time required is clearly dependent not only on hardware and thinking time but also the number of steps the agent takes per episode which was, unfortunately, consistently short.
 
 \begin{figure}[!h]
 \centering
 	\includegraphics[width=\linewidth]{images/mlp_vs_forest_gamma_1.png}
-	\caption{\textit{Here we see the performance of 40 generations trained with the random forest and 8 generations using the MLP. We chose not to train the MLP further as the time constraints were too severe and we were not seeing any improvement.}}
+	\caption{\textit{Here we see the performance of $40$ generations trained with the random forest and $8$ generations using the MLP. We chose not to train the MLP further as the time constraints were too severe and we were not seeing any improvement.}}
 	\label{mlp_vs_forest_gamma_1.0}
 \end{figure}
 
 After these results we assessed potential reasons for such a static reward graph, that is to say a plateau in the rewards attained. To improve the quality of the next agent we looked at the following aspects of our learning process:
 \begin{itemize}
-	\item Firstly we looked at the exploration policy which originally effectively lead the agent to choose a non-$\pi$ based action every $4$ moves with $\epsilon=0.25$. We realised this would probabilistically cap the number of moves the agent would do before placing a bomb in a possibly precarious situation with $\#Action=6$ at $\frac{6}{0.25}=24$ moves. We chose to edit the exploration structure to follow what we discuss in \ref{explo}, to ensure exploration effectively occurs in $\epsilon*100\%$ of games rather than in every game, effectively increasing exploitation. Although exploitation leads to plateaus in general once the agent has fully exploited a particular policy it is using, we hope it explores often enough to prevent this and see more danger in the agent never learning how to play further than $24$ moves. 
-	\item Secondly we looked at our rewards which originally offered $100$ points for a \state{coin\_found}, $10$ for an \state{invalid\_move}, $500$ for a kill and $-400$ for a death (that is to say loosely following the scoring scheme). We chose to exaggerate the rare but important events(coins, kills, death) to ensure that \textit{when} they occurred, they were noticed. We also harshly punished the \state{invalid\_move} as our first goal was to train an agent who knew how to manoeuvre through the map.
-	\item Thirdly, after implementing a method to show the agents selected move, after a few generations we grew frustrated with the sheer quantity of \state{WAIT} actions the agent selected, and increased the punishment for the action to $-5$. This seemed to have the desired effect as 'wait until I die' runs were not seen again.
+	\item Firstly, we looked at the exploration policy which, originally, effectively lead the agent to choose a non-$\pi$ based action every $4$ moves with $\epsilon=0.25$. We realised this would probabilistically cap the number of moves the agent would do before placing a bomb in a possibly precarious situation with $\#\text{actions}=6$ at $\frac{6}{0.25}=24$ moves. We chose to edit the exploration structure to follow what we discuss in \ref{explo}, to ensure exploration effectively occurs in $\epsilon*100\%$ of games rather than in every game, effectively increasing exploitation. Although exploitation leads to plateaus in general, once the agent has fully exploited a particular policy it is using, we hope it explores often enough to prevent this and see more danger in the agent never learning how to play further than $24$ moves. 
+	\item Secondly, we looked at our rewards which originally offered $100$ points for a \code{coin\_found}, $10$ for an \code{invalid\_move}, $500$ for a kill and $-400$ for a death (that is to say loosely following the scoring scheme). We chose to exaggerate the rare but important events(coins, kills, death) to ensure that \textit{when} they occurred, they were noticed. We also harshly punished the \code{invalid\_move} as our first goal was to train an agent who knew how to manoeuvre through the map.
+	\item Thirdly, after implementing a method to show the agents selected move, after a few generations we grew frustrated with the sheer quantity of \code{'WAIT'} actions the agent selected, and increased the punishment for the action to $-5$. This seemed to have the desired effect as 'wait until I die' runs were not seen again.
 \end{itemize}
 
 \subsection{Improving the learning process}
 \chapterauthor{Karl Thyssen}
 \subsubsection{Altering $\gamma$}
-After seeing the poor results in terms of learning improvements of the random forest with $\gamma = 1.0$ we proceeded to introduce $\gamma = 0.9$. The hope was to allow the agent to differentiate between a good move and a poor move rather than between a good game and a bad game by isolating the individual moves more from later ones. However due to the delayed effect of the bombs and explosions the move itself \textbf{must} include rewards from later moves to some extent. While keeping all else equal the change in gamma value resulted in the agent surviving for noticeably longer than previously, the overall reward however doesn't seem to have benefited in the same way. This is despite an increase in the agents score, we assume this is due to the increased moves, costing the agent the points it receives for randomly picking up coins.
+After seeing the poor results in terms of learning improvements of the random forest with $\gamma = 1.0$ we proceeded to introduce $\gamma = 0.9$. The hope was to allow the agent to differentiate between a good move and a poor move rather than between a good game and a bad game by isolating the individual moves more from later ones. However, due to the delayed effect of the bombs and explosions the move itself \textbf{must} include rewards from later moves to some extent. While keeping all else equal the change in gamma value resulted in the agent surviving for noticeably longer than previously, the overall reward however doesn't seem to have benefited in the same way. This is despite an increase in the agents score, we assume this is due to the increased moves, costing the agent the points it receives for randomly picking up coins.
 \begin{figure}[!h]
 \centering
 	\includegraphics[width=\linewidth]{images/forest09_vs_forest1rew.png}
@@ -61,13 +61,13 @@ After seeing the poor results in terms of learning improvements of the random fo
 \begin{figure}[!h]
 \centering
 	\includegraphics[width=\linewidth]{images/forest09_vs_forest1sco.png}
-	\caption{\textit{Clearly the scores for the agent are not consistent throughout the generations, the primary difference being the fact that in 100 games the $\gamma = 0.9$ agent consistently collects the equivalent of 3 coins.}}
+	\caption{\textit{Clearly, the scores for the agent are not consistent throughout the generations, the primary difference being the fact that in $100$ games the $\gamma = 0.9$ agent consistently collects the equivalent of $3$ coins.}}
 	\label{forest09_vs_forest1sco}
 \end{figure}
 \begin{figure}[!h]
 \centering
 	\includegraphics[width=\linewidth]{images/forest09_vs_forest1ste.png}
-	\caption{\textit{While the agent with $\gamma = 1.0$ plateaus at 6 steps of survival, indicating his first action is to place a bomb and die to it after 5 steps, the other agent survives around 20 steps longer.}}
+	\caption{\textit{While the agent with $\gamma = 1.0$ plateaus at $6$ steps of survival, indicating his first action is to place a bomb and die to it after $5$ steps, the other agent survives around $20$ steps longer.}}
 	\label{forest09_vs_forest1ste}
 \end{figure}
 
@@ -125,7 +125,7 @@ Finally the spectrum of agents we trained makes for a sorry sight in the graphs:
 	\label{allsco}
 \end{figure}
 
-We will submit the agent using 180 features in its state vector with $\gamma=0.9$ as this seems to be the agent most consistently getting the highest score over the generations, at a maximum of one coin per ten episodes. We will christen it 'kain\_agent' in reference to its fathers and its abilities.
+We will submit the agent using 180 features in its state vector with $\gamma=0.9$ as this seems to be the agent most consistently getting the highest score over the generations, at a maximum of one coin per ten episodes. We will christen it \code{kain\_agent} in reference to its fathers and its abilities.
 %show results of initial training
 %random forest too erratic - as single steps can be fatal, inaccuracies can have drastic consequences
 %let train for a long time as unclear when we should see results
@@ -153,13 +153,16 @@ As we see it, the topics to be discussed are mostly the sections above:
 \end{itemize}
 
 \subsubsection{State Representation}
+\chapterauthor{Hein-Erik Schnell}
 With what we saw so far, we have to assume that less features in the state vector lead to far less possible states and better performance of the agent. The $180$-features version of the state vector is already close to the smallest form of state vector possible if we want to represent the whole game board, which would be at least $176$ features ($176$ accessible cells). \par
 A possible improvement would be a state vector which does not represent the whole game board. The simple agents, for example, only know the position of possible targets and whether they are in danger. With this in mind, we could create a state vector which gives only the informations relevant to the simple agents. Given that in most cases most of the game board is not relevant (especially at the beginning of an episode), this seems to be a quite reasonable approach. It would also help the agent to prioritize certain features, e.g. avoid explosions before collecting coins.
 
 \subsubsection{Reward Scheme}
+\chapterauthor{Hein-Erik Schnell}
 In the plots above, we see that achieved scores and rewards hardly correlate. In the ideal case, higher score means more rewards. Since this is not the case, we need to revisit our reward scheme and distribute much higher rewards for what actually scores. On the other hand, our agent died a lot which meant lots of penalties. But we don't get negative scores for dying. We don't really know which way is better and we would have tried both ways in order to find out.
 
 \subsubsection{Regressors}
+\chapterauthor{Hein-Erik Schnell}
 The regressors were the third crucial design choice. As hinted above, choosing a regressor which is very erratic (Random Forest Regressor) and one which we don't know much about (MLP-Regressor) left us somewhat dissatisfied. Still, they were the most practical choices to us.\par
 For both regressors we used almost the default settings. Adjusting those settings accordingly to our task might have helped a lot. But in the case of the MLP-Regressor, we could only guess what effects the various parameters might have. \par
 
@@ -168,13 +171,16 @@ All in all, choosing a better suited regressor and adjusting its parameters prop
 One should also mention that, after each generation, we fitted a whole new Forest. One could try to adjust the former Forest towards the data, instead.
 
 \subsubsection{Training procedure}
+\chapterauthor{Hein-Erik Schnell}
 We mostly trained our model with $10000$ episodes per generation. In one case even for more than $40$ generations (i.e. $400000$ episodes). Since Reinforcement Learning sometimes requires long times before encountering a good policy, we could never know whether our agent is not able to learn properly (because of the points above) or if it just didn't have enough time. With almost no experience from prior projects or exercises concerning RL, we didn't know how to find out which is the case. Speaking of only the training procedure, having more episodes per generation and letting it run for more generations might always improve the results.
 
 \subsubsection{Exploration / Exploitation}
+\chapterauthor{Hein-Erik Schnell}
 As mentioned before, the agent tends to kill itself if \textit{exploration} is enabled because it is likely to take random actions shortly after having placed a bomb. In order to prevent this, one could lower the $\epsilon$ significantly. Apart from that, we think that \textit{exploration/exploitation} is of less importance in terms of improving the model. The bottleneck are the points mentioned in \textit{State Representation, Reward Scheme} and \textit{Regressors}. 
 
 \subsection{Further Comments on the final project}
 \subsubsection{Hein}
-As already implied in several parts of the report, our greatest issue was the lack of knowledge and experience with Reinforcement Learning. Some exercises with feedback and sample solutions would have helped a lot. For the next time, I propose to divide the final project into subtasks which are then given to the students as the final one or two exercise sheets and let the final project be something like the final improvements to an already working environment and model.
+As already implied in several parts of the report, our greatest issue was the lack of knowledge and experience with Reinforcement Learning. Some exercises with feedback and sample solutions would have helped a lot. For the next time, I propose to divide the final project into subtasks which are then given to the students as the final one or two exercise sheets and let the final project be something like the final improvements to an already working environment and model.\par
+Even though the report reads as if the time spent on this project was characterized by frustration, it definitely wasn't. The entire nature of the project encouraged us to keep working and trying. However unsuccessful the whole idea of substituting the exam with this project might seem (if many other groups had the same issues as we), it will give you the opportunity to learn from the problems which arise from the reports and to offer the students a much more enjoyable experience next year!
 \subsubsection{Karl}
 I think it would have been very helpful/interesting to learn before the project or as part of the project itself how to adjust the parameters that are used to make them feel less arbitrary. A large part of the problem was that we had no idea whether an adjustment would be effective and how or where to adjust parameters to have the desired effect as training to test for an impact would take days. Overall I did thoroughly enjoy the project but would have appreciated some additional guidance to ensure I also learnt how it is done properly.

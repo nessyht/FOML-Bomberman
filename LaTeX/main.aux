@@ -1,65 +1,68 @@
 \relax 
-\babel@aux{english}{}
-\@writefile{toc}{\contentsline {section}{\numberline {1}Learning Method and Regression Model}{2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}State representation}{2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{State representation 1}{2}\protected@file@percent }
+\select@language{english}
+\@writefile{toc}{\select@language{english}}
+\@writefile{lof}{\select@language{english}}
+\@writefile{lot}{\select@language{english}}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Learning Method and Regression Model}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}State representation}{2}}
+\@writefile{toc}{\contentsline {subsubsection}{State representation 1}{2}}
 \newlabel{State_rep_1}{{1.1}{2}}
 \citation{paper}
-\@writefile{toc}{\contentsline {subsubsection}{State representation 2}{4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{State representation 2}{4}}
 \newlabel{State_rep_2}{{1.1}{4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Rewards}{5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Regressors}{6}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces \textit  {For this figure, {\normalfont  {\fontfamily  {pcr}\selectfont  sklearn.datasets.make\_regression}} was used to create $10000$ samples with $100$ features of which $10$ are informative. We then trained the Random Forest Regressor and the MLP-Regressor provided by {\normalfont  scikit-learn} with $80\%$ of the generated data. The figure shows the predicted values of the remaining $20\%$ of the data which were used as a test set. The test set has previously been sorted by the true target value in ascending order.}}}{8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Rewards}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Regressors}{7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces \textit  {For this figure, {\normalfont  {\fontfamily  {pcr}\selectfont  sklearn.datasets.make\_regression}} was used to create $10000$ samples with $100$ features of which $10$ are informative. We then trained the Random Forest Regressor and the MLP-Regressor provided by {\normalfont  scikit-learn} with $80\%$ of the generated data. The figure shows the predicted values of the remaining $20\%$ of the data which were used as a test set. The test set has previously been sorted by the true target value in ascending order.}}}{8}}
 \newlabel{forest_mlp_comp1}{{1}{8}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces \textit  {This figure displays the same data as Figure 1. Here, the x-axis represents the position of each instance sorted by its target value, the y-axis displays the position if the instances had been sorted by the predicted target values of the respective regressor. The more the predictions resemble the correct order (the green line) the better the regressor is suited for our task.}}}{9}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces \textit  {This figure displays the same data as Figure 1. Here, the x-axis represents the position of each instance sorted by its target value, the y-axis displays the position if the instances had been sorted by the predicted target values of the respective regressor. The more the predictions resemble the correct order (the green line) the better the regressor is suited for our task.}}}{9}}
 \newlabel{forest_mlp_comp2}{{2}{9}}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Training Process}{9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Training Process}{9}}
 \citation{paper}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Q-Learning}{11}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Exploration and exploitation}{11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Q-Learning}{11}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Exploration and exploitation}{11}}
 \newlabel{explo}{{2.2}{11}}
-\@writefile{toc}{\contentsline {subsubsection}{Max-Boltzman-exploration}{12}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces \textit  {Exemplary table of expected rewards $Q(s,a)$ and corresponding probabilities $\pi (s,a)$ if $T$ is chosen as described above. In this case: $T=30.4$}}}{12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Max-Boltzman-exploration}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces \textit  {Exemplary table of expected rewards $Q(s,a)$ and corresponding probabilities $\pi (s,a)$ if $T$ is chosen as described above. In this case: $T=30.4$}}}{12}}
 \newlabel{MB_table}{{3}{12}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Training data}{12}\protected@file@percent }
-\citation{paper}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Results}{13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Training data}{13}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Results}{13}}
 \newlabel{results}{{3}{13}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Overview}{13}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}The initial approach}{13}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces \textit  {Here we see the performance of 40 generations trained with the random forest and 8 generations using the MLP. We chose not to train the MLP further as the time constraints were too severe and we were not seeing any improvement.}}}{14}\protected@file@percent }
-\newlabel{mlp_vs_forest_gamma_1.0}{{4}{14}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Improving the learning process}{15}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Altering $\gamma $}{15}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces \textit  {Here we see the performance of the random forests trained with their respective gamma values, clearly there is no great difference in the rewards other, they both plateau within around 2 invalid move values of rewards of each-other. The relevant change is noticed in the rewards and survival graphs that follow.}}}{16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Overview}{13}}
+\citation{paper}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}The initial approach}{14}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces \textit  {Here we see the performance of $40$ generations trained with the random forest and $8$ generations using the MLP. We chose not to train the MLP further as the time constraints were too severe and we were not seeing any improvement.}}}{15}}
+\newlabel{mlp_vs_forest_gamma_1.0}{{4}{15}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Improving the learning process}{15}}
+\@writefile{toc}{\contentsline {subsubsection}{Altering $\gamma $}{15}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces \textit  {Here we see the performance of the random forests trained with their respective gamma values, clearly there is no great difference in the rewards other, they both plateau within around 2 invalid move values of rewards of each-other. The relevant change is noticed in the rewards and survival graphs that follow.}}}{16}}
 \newlabel{forest09_vs_forest1rew}{{5}{16}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces \textit  {Clearly the scores for the agent are not consistent throughout the generations, the primary difference being the fact that in 100 games the $\gamma = 0.9$ agent consistently collects the equivalent of 3 coins.}}}{16}\protected@file@percent }
-\newlabel{forest09_vs_forest1sco}{{6}{16}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces \textit  {While the agent with $\gamma = 1.0$ plateaus at 6 steps of survival, indicating his first action is to place a bomb and die to it after 5 steps, the other agent survives around 20 steps longer.}}}{17}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Streamlining the state vector}{16}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces \textit  {Clearly, the scores for the agent are not consistent throughout the generations, the primary difference being the fact that in $100$ games the $\gamma = 0.9$ agent consistently collects the equivalent of $3$ coins.}}}{17}}
+\newlabel{forest09_vs_forest1sco}{{6}{17}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces \textit  {While the agent with $\gamma = 1.0$ plateaus at $6$ steps of survival, indicating his first action is to place a bomb and die to it after $5$ steps, the other agent survives around $20$ steps longer.}}}{17}}
 \newlabel{forest09_vs_forest1ste}{{7}{17}}
-\@writefile{toc}{\contentsline {subsubsection}{streamlining the state vector}{17}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Training changes}{17}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces \textit  {As before, the reward graph is disappointing as it seems the agent does not learn to increase his reward any further despite clearly (as can be seen from the scores) not playing the game optimally.}}}{18}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces \textit  {As before, the reward graph is disappointing as it seems the agent does not learn to increase his reward any further despite clearly (as can be seen from the scores) not playing the game optimally.}}}{18}}
 \newlabel{forest532_vs_forest180rew}{{8}{18}}
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces \textit  {The scores achieved for the agents trained in identical conditions other than their feature representation. Clearly the prevailing trend is for the scores of the simplified agent to be greater than those of the $532$ feature agent.}}}{18}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces \textit  {The scores achieved for the agents trained in identical conditions other than their feature representation. Clearly the prevailing trend is for the scores of the simplified agent to be greater than those of the $532$ feature agent.}}}{18}}
 \newlabel{forest532_vs_forest180sco}{{9}{18}}
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces \textit  {The agent with its state vector consisting of $180$ features consistently survives longer than the one with the lager state vector.}}}{19}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces \textit  {The agent with its state vector consisting of $180$ features consistently survives longer than the one with the lager state vector.}}}{19}}
 \newlabel{forest532_vs_forest180ste}{{10}{19}}
-\@writefile{toc}{\contentsline {subsubsection}{Final Data}{19}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces \textit  {Shows the average reward earned by each agent in each generation.}}}{19}\protected@file@percent }
-\newlabel{allrew}{{11}{19}}
-\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces \textit  {Shows the average score attained by each agent in each generation.}}}{20}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Training changes}{19}}
+\@writefile{toc}{\contentsline {subsubsection}{Final Data}{19}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces \textit  {Shows the average reward earned by each agent in each generation.}}}{20}}
+\newlabel{allrew}{{11}{20}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces \textit  {Shows the average score attained by each agent in each generation.}}}{20}}
 \newlabel{allsco}{{12}{20}}
-\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces \textit  {Shows the average number of steps by each agent in each generation, shows how self training lead to increasing survival with negatively trending reward.}}}{20}\protected@file@percent }
-\newlabel{allsco}{{13}{20}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Outlook}{20}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{State Representation}{21}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Reward Scheme}{21}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Regressors}{21}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Training procedure}{22}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Exploration / Exploitation}{22}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Further Comments on the final project}{22}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Hein}{22}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Karl}{22}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Outlook}{20}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces \textit  {Shows the average number of steps by each agent in each generation, shows how self training lead to increasing survival with negatively trending reward.}}}{21}}
+\newlabel{allsco}{{13}{21}}
+\@writefile{toc}{\contentsline {subsubsection}{State Representation}{21}}
+\@writefile{toc}{\contentsline {subsubsection}{Reward Scheme}{22}}
+\@writefile{toc}{\contentsline {subsubsection}{Regressors}{22}}
+\@writefile{toc}{\contentsline {subsubsection}{Training procedure}{22}}
+\@writefile{toc}{\contentsline {subsubsection}{Exploration / Exploitation}{23}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Further Comments on the final project}{23}}
+\@writefile{toc}{\contentsline {subsubsection}{Hein}{23}}
+\@writefile{toc}{\contentsline {subsubsection}{Karl}{23}}
 \bibcite{RL_intro}{1}
 \bibcite{paper}{2}

@@ -53,7 +53,7 @@ This section is divided into the three crucial tasks for which we needed to deve
 	\begin{itemize}
 		\item For each cell:
 		\begin{itemize}
-			\item \textbf{Empty, agent, opponent, crate, coin, danger level} \state{0,1,2,4,5 \dots 11}:\\
+			\item \textbf{Empty, agent, opponent, crate, coin, danger level} \state{0,1,2,3,4,5 \dots 11}:\\
 			Empty cells are $0$. Cells with agent, opponent, crate or coin are \state{1,2,3,4}, respectively. The values \state{5 \dots 11} represent the danger level because there is a bomb affecting the respective cell. $5$ is not used, \state{6 \dots 9} is the four-time-steps countdown, \state{10,11} the two-time-steps explosion. If there is a danger level the values \state{1,2,3,4} are overwritten. This means that the position of the agent might not be represented anymore in this feature.
 		\end{itemize}
 		\item Just once (implemented in our code as \code{extras})
@@ -74,25 +74,25 @@ This section is divided into the three crucial tasks for which we needed to deve
 	
 	\subsection{Rewards}
 	\chapterauthor{Karl Thyssen}
-	The individual rewards for events that occur in a given step contribute to the reward function and are explicitly defined in the \code{reward\_update()} and \code{end\_of\_episode} functions. The other parameter to influence is the discount factor $\gamma$ for the discounted long term reward. We ran training with factors $\gamma = 1.0$ and $\gamma = 0.9$. The reward function is describe by a series of \code{if} clauses that determine the quality of the action taken and apply the reward.
+	The individual rewards for events that occur in a given step contribute to the reward function and are explicitly defined in the \code{reward\_update()} and \code{end\_of\_episode} functions. The other parameter to influence is the discount factor $\gamma$ for the discounted long term reward. We ran training with factors $\gamma = 1.0$ and $\gamma = 0.9$. The reward function is described by a series of \code{if} clauses that determine the quality of the action taken and apply the reward.
 
 \begin{itemize}
 	\item \textbf{Valid move}: $-1$ \\Every step is punished in a small way to encourage the agent to complete tasks in the shortest possible time to avoid stacking negative rewards.
-	\item \textbf{Wait}: $-5$\\We noticed while running preliminary quick trains that the agent quickly regressed into a pattern of repeated 'Waits' after only a few generations. Arguably other factors were also different at the time so its debatable how effective this now is.
+	\item \textbf{Wait}: $-5$\\We noticed while running preliminary quick trains that the agent quickly regressed into a pattern of repeated 'Wait's after only a few generations. Arguably other factors were also different at the time so its debatable how effective this now is.
 	\item \textbf{Invalid action}: $-100$\\Invalid actions should be punished so the agent quickly learns the connections in between the fields and the restrictions on the frequency of bomb placements.
-	\item \textbf{Destroy crate}: $+10$\\The agent should learn to destroy crates
-	\item \textbf{Coin found}: $+20$\\The agent should want to destroy as many crates as possible to find coins
-	\item \textbf{Collect coin}: $+2000$\\The agent is heavily rewarded for finding coins to incentivise coin collection as a primary goal 
-	\item \textbf{Killed opponent}: $+10000$\\If the agent does accidentally kill an agent in training it should have a large weighting so this behaviour can be encouraged, particularly as this will be rare initially
-	\item \textbf{Die (from opponent bomb)}: $-2000$\\The agent should learn to avoid all bombs...
-	\item \textbf{Die (suicide)}: $-1500$\\...but rather die to its own to deny opponents 5 points.
+	\item \textbf{Destroy crate}: $+10$\\The agent should learn to destroy crates.
+	\item \textbf{Coin found}: $+20$\\The agent should want to destroy as many crates as possible to find coins.
+	\item \textbf{Collect coin}: $+2000$\\The agent is heavily rewarded for finding coins to incentivise coin collection as a primary goal.
+	\item \textbf{Killed opponent}: $+10000$\\If the agent does accidentally kill an agent in training it should have a large weighting so this behaviour can be encouraged, particularly as this will be rare initially.
+	\item \textbf{Die (from opponent bomb)}: $-2000$\\The agent should learn to avoid all bombs \dots
+	\item \textbf{Die (suicide)}: $-1500$\\ \dots but rather die to its own to deny opponents 5 points.
 \end{itemize}	
 	
-	We did not change the rewards in our tweaking due to the fact that we were not sure how to effectively test changes. Our superficial tests (anecdotal) never lead to ground breaking changes and as such we couldn't realistically change them with the expectation that something would be positively influenced. Particularly reflecting the amount of time it would have taken to train even 10 generations of the changes however some interesting ideas we would perhaps have next investigated are:
+	We did not change the rewards in our tweaking due to the fact that we were not sure how to effectively test changes. Our superficial tests (anecdotal) never lead to ground breaking changes and as such we couldn't realistically change them with the expectation that something would be positively influenced. Particularly reflecting the amount of time it would have taken to train even 10 generations of the changes. However, some interesting ideas we would perhaps have next investigated are:
 	\begin{itemize}
-		\item Whether a movement to a cell should be rewarded based on proximity to other agents/bombs or coins and how we allow these factors to influence the positivity or negativity of an action. I.e. A step towards a coin that is also a step into an exploding bomb should lead to a negative reward.
-		\item Should we punish the repetition of actions, such as the movement to a previously occupied square which may be undesirable and therefore punished with a small negative value, or should this only be the case when not running from a bomb
-		\item Not punishing death or any actions we perceive to be negative but rather only enforce good ones and let the agent decide whether the risks are worth taking that is to say whether the punishment of not getting the reward is discouragement enough
+		\item Whether a movement to a cell should be rewarded based on proximity to other agents/bombs or coins and how we allow these factors to influence the positivity or negativity of an action. I.e. a step towards a coin that is also a step into an exploding bomb should lead to a negative reward.
+		\item Should we punish the repetition of actions, such as the movement to a previously occupied cell which may be undesirable and therefore punished with a small negative value, or should this only be the case when not running from a bomb?
+		\item Not punishing death or any actions we perceive to be negative but rather only enforce good ones and let the agent decide whether the risks are worth taking that is to say whether the punishment of not getting the reward is discouragement enough.
 	\end{itemize}
 	
 	\subsection{Regressors}
@@ -110,7 +110,7 @@ This section is divided into the three crucial tasks for which we needed to deve
 		\item \code{RandomForestRegressor()}
 		\item \code{MLPRegressor(max\_iter=500)}
 	\end{itemize}
-	Thus, we used the Forest with its default settings and changed the maximum number of iterations of the MLP to $500$ (default is $200$).
+	Thus, we used the Forest with its default settings and changed the maximum number of iterations of the MLP to $500$ (default is $200$) because the regressor sent out a warning that $200$ iterations were not sufficient to reach convergence.
 	
 	\begin{figure}[h]
 		\centering
