@@ -121,10 +121,10 @@ This section is divided into the three crucial tasks for which we needed to deve
 	\begin{figure}[h]
 		\centering
 		\includegraphics[width=\linewidth]{images/mlp_forest_comparison02.png}
-		\caption{\textit{This figure displays the same data as Figure \ref{forest_mlp_comp1}. Here, the x-axis represents the position of each instance sorted by its target value, the y-axis displays the position if the instances had been sorted by the predicted target values of the respective regressor. The more the predictions resemble the correct order (the green line) the better the regressor is suited for our task.}}
+		\caption{\textit{This figure displays the same data as Figure 1. Here, the x-axis represents the position of each instance sorted by its target value, the y-axis displays the position if the instances had been sorted by the predicted target values of the respective regressor. The more the predictions resemble the correct order (the green line) the better the regressor is suited for our task.}}
 		\label{forest_mlp_comp2}
 	\end{figure}
 
 	In order to get a feeling for the performance of both regressors, we used the function \code{sklearn.datasets.make\_regression} to create $10000$ samples with $100$ features of which $10$ are informative. We then trained the Random Forest Regressor and the MLP-Regressor with $80\%$ of the generated data and let both regressors predict the values of the remaining $20\%$ of the data. Figure \ref{forest_mlp_comp1} shows how much more accurate the MLP-regressor performs compared to the Random Forest Regressor. Figure \ref{forest_mlp_comp2} shows how the MLP-Regressor maintains the order of the instances much better than the Random Forest Regressor. In case of the latter, many values are sorted into completely other regions than where they actually belong. This is also due to the fact that the range of values of the generated data is of the same magnitude as the inaccuracies of the Forest. Still, the MLP manages to predict these values much better.
-
+\newpage
 	

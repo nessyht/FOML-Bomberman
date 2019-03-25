@@ -13,7 +13,7 @@ def setup(self):
 
     for move in moves:
         self.regressors.append(pickle.load(open('013' + '_' + move + '.txt', 'rb')))
-        print('013' + '_' + move + '.txt')
+        #print('013' + '_' + move + '.txt')
         
 
 def training(states, actions, rewards, generation):
@@ -214,7 +214,7 @@ def act(self):
     if (self.next_action == 'UP' and arena[x,y-1] != 0) or (self.next_action == 'Down' and arena[x,y+1] != 0) or (self.next_action == 'LEFT' and arena[x-1,y] != 0) or (self.next_action == 'RIGHT' and arena[x+1,y] != 0) or (self.next_action == 'BOMB' and not bombs_left):
         invalid = True
                         
-    print(self.next_action, ('-Valid' if not invalid else '-Invalid'), '(', x, y, ')')
+    #print(self.next_action, ('-Valid' if not invalid else '-Invalid'), '(', x, y, ')')
     
     
     

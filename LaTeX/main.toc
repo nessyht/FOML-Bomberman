@@ -5,24 +5,24 @@
 \contentsline {subsubsection}{State representation 2}{4}% 
 \contentsline {subsection}{\numberline {1.2}Rewards}{5}% 
 \contentsline {subsection}{\numberline {1.3}Regressors}{6}% 
-\contentsline {section}{\numberline {2}Training Process}{8}% 
-\contentsline {subsection}{\numberline {2.1}Q-Learning}{10}% 
+\contentsline {section}{\numberline {2}Training Process}{9}% 
+\contentsline {subsection}{\numberline {2.1}Q-Learning}{11}% 
 \contentsline {subsection}{\numberline {2.2}Exploration and exploitation}{11}% 
-\contentsline {subsubsection}{Max-Boltzman-exploration}{11}% 
+\contentsline {subsubsection}{Max-Boltzman-exploration}{12}% 
 \contentsline {subsection}{\numberline {2.3}Training data}{12}% 
 \contentsline {section}{\numberline {3}Results}{13}% 
 \contentsline {subsection}{\numberline {3.1}Overview}{13}% 
 \contentsline {subsection}{\numberline {3.2}The initial approach}{13}% 
 \contentsline {subsection}{\numberline {3.3}Improving the learning process}{15}% 
 \contentsline {subsubsection}{Altering $\gamma $}{15}% 
-\contentsline {subsubsection}{streamlining the state vector}{15}% 
-\contentsline {subsubsection}{Training changes}{18}% 
+\contentsline {subsubsection}{streamlining the state vector}{17}% 
+\contentsline {subsubsection}{Training changes}{17}% 
 \contentsline {subsubsection}{Final Data}{19}% 
 \contentsline {subsection}{\numberline {3.4}Outlook}{20}% 
-\contentsline {subsubsection}{State Representation}{20}% 
+\contentsline {subsubsection}{State Representation}{21}% 
 \contentsline {subsubsection}{Reward Scheme}{21}% 
 \contentsline {subsubsection}{Regressors}{21}% 
-\contentsline {subsubsection}{Training procedure}{21}% 
+\contentsline {subsubsection}{Training procedure}{22}% 
 \contentsline {subsubsection}{Exploration / Exploitation}{22}% 
 \contentsline {subsection}{\numberline {3.5}Further Comments on the final project}{22}% 
 \contentsline {subsubsection}{Hein}{22}% 

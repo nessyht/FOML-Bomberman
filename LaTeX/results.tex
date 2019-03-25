@@ -28,7 +28,7 @@ Other variations include:
 %Discuss reasons behind initial approach - also mlp regressor (slow to fit so less data)
 \subsection{The initial approach}
 \chapterauthor{Karl Thyssen}
-Having decided on the random forest regressors as the medium for storing our Q, and knowing the random forest has the ability to determine feature importances and weightings itself we decided to throw every feature we could think of at it as described in \ref{State_rep_1}. We initially also chose a $\gamma$ value of $1.0$ for simplicity in testing and began to train an agent. In \cite{paper} the agent trains for 10000 episodes per generation and begins to show a large improvement between generations $0$ and $20$, however that agent is trained using a neural network so we expected a longer wait before seeing such spikes in performance. This is due to the erratic nature of the predictions made by the forests in relation to the MLP we tested.
+Having decided on the random forest regressors as the medium for storing our Q, and knowing the random forest has the ability to determine feature importances and weightings itself we decided to throw every feature we could think of at it as described using \ref{State_rep_1}. We initially also chose a $\gamma$ value of $1.0$ for simplicity in testing and began to train an agent. In \cite{paper} the agent trains for 10000 episodes per generation and begins to show a large improvement between generations $0$ and $20$, however that agent is trained using a neural network so we expected a longer wait before seeing such spikes in performance. This is due to the erratic nature of the predictions made by the forests in relation to the MLP we tested.
 
 Out of interest we also tested the same set-up using an MLP regressor, however unlike the forest, the impact of using any and all features was an exorbitant time required for the fitting after each generation, often longer than the data generation itself.
 
@@ -73,7 +73,7 @@ After seeing the poor results in terms of learning improvements of the random fo
 
 This indicates that some learning takes place as the agent no longer commits suicide early. Other points to support this are that most actions the agent performs must be valid, hence the discrepancy to the $\gamma = 1.0$ agent's baseline of only 200 points. Therefore the agent must have learnt how to make valid moves in the initial starting positions and must sometimes collect rewards(hence the points). This is corroborated purely qualitatively as we printed the agent's moves' validity and could observe a decrease in invalid moves after the first two generations. Unfortunately there doesn't seem to be a positive trend in any on these metrics to indicate improvement other than potentially a very small gain in survival steps.
 
-\subsubsection{streamlining the state vector}
+\subsubsection{Streamlining the state vector}
 Our initial approach having been the 'the more the merrier' variant we decided to assess look at the state vector again to remove redundancies. There are many alternative methods to present the state vector, which we will discuss later, wishing to stay close to our original schematic we selected however to simplify our original rather than changing it conceptually. Therefore we implemented the modified state vector in \ref{State_rep_2}.
 
 \begin{figure}[!h]
@@ -125,7 +125,7 @@ Finally the spectrum of agents we trained makes for a sorry sight in the graphs:
 	\label{allsco}
 \end{figure}
 
-We will submit the agent using 180 features in its state vector with $\gamma=0.9$ as this seems to be the agent most consistently getting the highest score over the generations, at a maximum of one coin per ten episodes. We will christen it 'kain_agent' in reference to its fathers and its abilities.
+We will submit the agent using 180 features in its state vector with $\gamma=0.9$ as this seems to be the agent most consistently getting the highest score over the generations, at a maximum of one coin per ten episodes. We will christen it 'kain\_agent' in reference to its fathers and its abilities.
 %show results of initial training
 %random forest too erratic - as single steps can be fatal, inaccuracies can have drastic consequences
 %let train for a long time as unclear when we should see results
