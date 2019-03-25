@@ -1,5 +1,8 @@
+\subsection{Overview}
 \chapterauthor{Karl Thyssen}
 Here we will discuss the results we saw for the various approaches we attempted.
+
+To gather statistics all bots played $100$ games vs. $3$ \code{simple\_agents} and the results were then averages over all games.
 
 As previously mentioned we experimented with a $\gamma$ value of $1.0$ and $0.9$ after which we continued other variations at $\gamma = 0.9$.
 Other variations include:
@@ -41,7 +44,7 @@ The time required to generate data for and fit each generation was between $4800
 After these results we assessed potential reasons for such a static reward graph, that is to say a plateau in the rewards attained. To improve the quality of the next agent we looked at the following aspects of our learning process:
 \begin{itemize}
 	\item Firstly we looked at the exploration policy which originally effectively lead the agent to choose a non-$\pi$ based action every $4$ moves with $\epsilon=0.25$. We realised this would probabilistically cap the number of moves the agent would do before placing a bomb in a possibly precarious situation with $\#Action=6$ at $\frac{6}{0.25}=24$ moves. We chose to edit the exploration structure to follow what we discuss in \ref{explo}, to ensure exploration effectively occurs in $\epsilon*100\%$ of games rather than in every game, effectively increasing exploitation. Although exploitation leads to plateaus in general once the agent has fully exploited a particular policy it is using, we hope it explores often enough to prevent this and see more danger in the agent never learning how to play further than $24$ moves. 
-	\item Secondly we looked at our rewards which originally offered $100$ points for a \state{coin\_found}, $10$ for an \state{invalid\_move}, $400$ for a kill and $-400$ for a death. We chose to exaggerate the rare but important events(coins, kills, death) to ensure that \textit{when} they occurred, they were noticed. We also harshly punished the \state{invalid\_move} as our first goal was to train an agent who knew how to manoeuvre through the map.
+	\item Secondly we looked at our rewards which originally offered $100$ points for a \state{coin\_found}, $10$ for an \state{invalid\_move}, $500$ for a kill and $-400$ for a death (that is to say loosely following the scoring scheme). We chose to exaggerate the rare but important events(coins, kills, death) to ensure that \textit{when} they occurred, they were noticed. We also harshly punished the \state{invalid\_move} as our first goal was to train an agent who knew how to manoeuvre through the map.
 	\item Thirdly, after implementing a method to show the agents selected move, after a few generations we grew frustrated with the sheer quantity of \state{WAIT} actions the agent selected, and increased the punishment for the action to $-5$. This seemed to have the desired effect as 'wait until I die' runs were not seen again.
 \end{itemize}
 
@@ -49,31 +52,28 @@ After these results we assessed potential reasons for such a static reward graph
 \chapterauthor{Karl Thyssen}
 \subsubsection{Altering $\gamma$}
 After seeing the poor results in terms of learning improvements of the random forest with $\gamma = 1.0$ we proceeded to introduce $\gamma = 0.9$. The hope was to allow the agent to differentiate between a good move and a poor move rather than between a good game and a bad game by isolating the individual moves more from later ones. However due to the delayed effect of the bombs and explosions the move itself \textbf{must} include rewards from later moves to some extent. While keeping all else equal the change in gamma value resulted in the agent surviving for noticeably longer than previously, the overall reward however doesn't seem to have benefited in the same way. This is despite an increase in the agents score, we assume this is due to the increased moves, costing the agent the points it receives for randomly picking up coins.
-
 \begin{figure}[!h]
 \centering
 	\includegraphics[width=\linewidth]{images/forest09_vs_forest1rew.png}
 	\caption{\textit{Here we see the performance of the random forests trained with their respective gamma values, clearly there is no great difference in the rewards other, they both plateau within around 2 invalid move values of rewards of each-other. The relevant change is noticed in the rewards and survival graphs that follow.}}
 	\label{forest09_vs_forest1rew}
 \end{figure}
-
 \begin{figure}[!h]
 \centering
 	\includegraphics[width=\linewidth]{images/forest09_vs_forest1sco.png}
 	\caption{\textit{Clearly the scores for the agent are not consistent throughout the generations, the primary difference being the fact that in 100 games the $\gamma = 0.9$ agent consistently collects the equivalent of 3 coins.}}
 	\label{forest09_vs_forest1sco}
 \end{figure}
-
 \begin{figure}[!h]
 \centering
 	\includegraphics[width=\linewidth]{images/forest09_vs_forest1ste.png}
 	\caption{\textit{While the agent with $\gamma = 1.0$ plateaus at 6 steps of survival, indicating his first action is to place a bomb and die to it after 5 steps, the other agent survives around 20 steps longer.}}
 	\label{forest09_vs_forest1ste}
 \end{figure}
-\newpage
+
 This indicates that some learning takes place as the agent no longer commits suicide early. Other points to support this are that most actions the agent performs must be valid, hence the discrepancy to the $\gamma = 1.0$ agent's baseline of only 200 points. Therefore the agent must have learnt how to make valid moves in the initial starting positions and must sometimes collect rewards(hence the points). This is corroborated purely qualitatively as we printed the agent's moves' validity and could observe a decrease in invalid moves after the first two generations. Unfortunately there doesn't seem to be a positive trend in any on these metrics to indicate improvement other than potentially a very small gain in survival steps.
 
-\subsection{streamlining the state vector}
+\subsubsection{streamlining the state vector}
 Our initial approach having been the 'the more the merrier' variant we decided to assess look at the state vector again to remove redundancies. There are many alternative methods to present the state vector, which we will discuss later, wishing to stay close to our original schematic we selected however to simplify our original rather than changing it conceptually. Therefore we implemented the modified state vector in \ref{State_rep_2}.
 
 \begin{figure}[!h]
@@ -101,6 +101,31 @@ As we can see, the new agent does not achieve a greater average reward while con
 
 At this point the next logical step, in hindsight, would have been an overhaul of the rewards, perhaps in some of the ways we explore later. However due to our earlier changes to the rewards and the fact we did not know how best to test for the best reward scheme we did not try variations on the rewards.
 
+\subsubsection{Training changes}
+We had a suspicion that as our agent does not interact with the simple agents of its own accord, that is to say it stays isolated in its own corner, the fastest way to train it would be to self train it with $4$ of itself in the arena until it gets to a point when it starts to meet its counterparts. However from our tests of this it seems that although it survives for a lot longer than all other agents it still does not seem to learn how to move out of its box to interact with other agents, merely it happily walks left and right until it randomly drops a bomb or reaches 400 steps.
+
+\subsubsection{Final Data}
+Finally the spectrum of agents we trained makes for a sorry sight in the graphs:
+\begin{figure}[!h]
+\centering
+	\includegraphics[width=\linewidth]{images/allrew.png}
+	\caption{\textit{Shows the average reward earned by each agent in each generation.}}
+	\label{allrew}
+\end{figure}
+\begin{figure}[!h]
+\centering
+	\includegraphics[width=\linewidth]{images/allsco.png}
+	\caption{\textit{Shows the average score attained by each agent in each generation.}}
+	\label{allsco}
+\end{figure}
+\begin{figure}[!h]
+\centering
+	\includegraphics[width=\linewidth]{images/allste.png}
+	\caption{\textit{Shows the average number of steps by each agent in each generation, shows how self training lead to increasing survival with negatively trending reward.}}
+	\label{allsco}
+\end{figure}
+
+We will submit the agent using 180 features in its state vector with $\gamma=0.9$ as this seems to be the agent most consistently getting the highest score over the generations, at a maximum of one coin per ten episodes. We will christen it 'kain_agent' in reference to its fathers and its abilities.
 %show results of initial training
 %random forest too erratic - as single steps can be fatal, inaccuracies can have drastic consequences
 %let train for a long time as unclear when we should see results
@@ -149,5 +174,7 @@ We mostly trained our model with $10000$ episodes per generation. In one case ev
 As mentioned before, the agent tends to kill itself if \textit{exploration} is enabled because it is likely to take random actions shortly after having placed a bomb. In order to prevent this, one could lower the $\epsilon$ significantly. Apart from that, we think that \textit{exploration/exploitation} is of less importance in terms of improving the model. The bottleneck are the points mentioned in \textit{State Representation, Reward Scheme} and \textit{Regressors}. 
 
 \subsection{Further Comments on the final project}
+\subsubsection{Hein}
 As already implied in several parts of the report, our greatest issue was the lack of knowledge and experience with Reinforcement Learning. Some exercises with feedback and sample solutions would have helped a lot. For the next time, I propose to divide the final project into subtasks which are then given to the students as the final one or two exercise sheets and let the final project be something like the final improvements to an already working environment and model.
-
+\subsubsection{Karl}
+I think it would have been very helpful/interesting to learn before the project or as part of the project itself how to adjust the parameters that are used to make them feel less arbitrary. A large part of the problem was that we had no idea whether an adjustment would be effective and how or where to adjust parameters to have the desired effect as training to test for an impact would take days. Overall I did thoroughly enjoy the project but would have appreciated some additional guidance to ensure I also learnt how it is done properly.

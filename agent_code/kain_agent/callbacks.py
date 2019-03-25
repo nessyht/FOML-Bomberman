@@ -10,15 +10,10 @@ def setup(self):
     np.random.seed()
     moves = ['UP','DOWN','LEFT','RIGHT','WAIT','BOMB']
     self.regressors = []
-    #self.generation = 0 # Let this be externally fixed
-    if self.train_flag.is_set():
-        generation = self.generation - 1
-    else:
-        generation = self.generation
-    
-    print('Agent now training with generation ', generation)
+
     for move in moves:
-        self.regressors.append(pickle.load(open('agent_code/my_agent/Training_data/trees/' + f'{generation:03}' + '_' + move + '.txt', 'rb')))
+        self.regressors.append(pickle.load(open('013' + '_' + move + '.txt', 'rb')))
+        print('013' + '_' + move + '.txt')
         
 
 def training(states, actions, rewards, generation):
@@ -79,7 +74,7 @@ def create_state_vector(self):
     
     x, y, _, bombs_left, s = self.game_state['self']
     bombs = self.game_state['bombs'].copy()
-    others = [(x,y) for (x,y,n,b) in self.game_state['others']]
+    others = [(x,y) for (x,y,n,b,s) in self.game_state['others']]
     coins = self.game_state['coins']
     step = self.game_state['step']
     explosions = self.game_state['explosions'].copy()
@@ -208,8 +203,8 @@ def act(self):
     self.logger.info('Pick action from trees')
     
     explore = False
-    if self.train_flag.is_set():  
-        explore = np.random.choice([True, False], p=[0.25, 0.75])
+    #if self.train_flag.is_set():  
+    #    explore = np.random.choice([True, False], p=[0.25, 0.75])
     self.next_action = choose_action(self.regressors, create_state_vector(self), exploring=explore)  
     
     arena = self.game_state['arena'].copy() 

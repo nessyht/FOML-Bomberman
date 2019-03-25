@@ -1,35 +1,29 @@
-\select@language {english}
-\contentsline {section}{\numberline {1}Learning Method and Regression Model}{2}
-\contentsline {subsection}{\numberline {1.1}State representation}{2}
-\contentsline {subsubsection}{State representation 1}{2}
-\contentsline {subsubsection}{State representation 2}{4}
-\contentsline {subsection}{\numberline {1.2}Rewards}{5}
-\contentsline {subsection}{\numberline {1.3}Regressors}{6}
-\contentsline {section}{\numberline {2}Training Process}{9}
-\contentsline {subsection}{\numberline {2.1}Q-Learning}{10}
-\contentsline {subsection}{\numberline {2.2}Exploration and exploitation}{10}
-\contentsline {subsubsection}{Max-Boltzman-exploration}{10}
-\contentsline {subsection}{\numberline {2.3}Training data}{11}
-\contentsline {section}{\numberline {3}Results}{12}
-\contentsline {subsection}{\numberline {3.1}The initial approach}{12}
-\contentsline {subsection}{\numberline {3.2}Outlook}{13}
-\contentsline {subsubsection}{State Representation}{14}
-\contentsline {subsubsection}{Reward Scheme}{14}
-\contentsline {subsubsection}{Regressors}{14}
-\contentsline {subsubsection}{Training procedure}{15}
-\contentsline {subsubsection}{Exploration / Exploitation}{15}
-\contentsline {subsection}{\numberline {3.3}Further Comments on the final project}{15}
-\contentsline {section}{\numberline {4}Heins thoughts}{15}
-\contentsline {subsection}{\numberline {4.1}State representation}{16}
-\contentsline {subsection}{\numberline {4.2}Rewards}{17}
-\contentsline {subsection}{\numberline {4.3}Estimator}{18}
-\contentsline {subsection}{\numberline {4.4}Learning algorithm}{18}
-\contentsline {subsection}{\numberline {4.5}Necessary functions}{19}
-\contentsline {section}{\numberline {5}Karls thoughts}{20}
-\contentsline {subsection}{\numberline {5.1}Neural Networks}{20}
-\contentsline {subsection}{\numberline {5.2}Classical approach}{21}
-\contentsline {subsubsection}{State appraisal}{21}
-\contentsline {subsubsection}{Rewards}{22}
-\contentsline {subsubsection}{Exploration vs. Exploitation}{23}
-\contentsline {section}{\numberline {6}Karls observations}{23}
-\contentsline {subsection}{\numberline {6.1}The state matrix}{23}
+\babel@toc {english}{}
+\contentsline {section}{\numberline {1}Learning Method and Regression Model}{2}% 
+\contentsline {subsection}{\numberline {1.1}State representation}{2}% 
+\contentsline {subsubsection}{State representation 1}{2}% 
+\contentsline {subsubsection}{State representation 2}{4}% 
+\contentsline {subsection}{\numberline {1.2}Rewards}{5}% 
+\contentsline {subsection}{\numberline {1.3}Regressors}{6}% 
+\contentsline {section}{\numberline {2}Training Process}{8}% 
+\contentsline {subsection}{\numberline {2.1}Q-Learning}{10}% 
+\contentsline {subsection}{\numberline {2.2}Exploration and exploitation}{11}% 
+\contentsline {subsubsection}{Max-Boltzman-exploration}{11}% 
+\contentsline {subsection}{\numberline {2.3}Training data}{12}% 
+\contentsline {section}{\numberline {3}Results}{13}% 
+\contentsline {subsection}{\numberline {3.1}Overview}{13}% 
+\contentsline {subsection}{\numberline {3.2}The initial approach}{13}% 
+\contentsline {subsection}{\numberline {3.3}Improving the learning process}{15}% 
+\contentsline {subsubsection}{Altering $\gamma $}{15}% 
+\contentsline {subsubsection}{streamlining the state vector}{15}% 
+\contentsline {subsubsection}{Training changes}{18}% 
+\contentsline {subsubsection}{Final Data}{19}% 
+\contentsline {subsection}{\numberline {3.4}Outlook}{20}% 
+\contentsline {subsubsection}{State Representation}{20}% 
+\contentsline {subsubsection}{Reward Scheme}{21}% 
+\contentsline {subsubsection}{Regressors}{21}% 
+\contentsline {subsubsection}{Training procedure}{21}% 
+\contentsline {subsubsection}{Exploration / Exploitation}{22}% 
+\contentsline {subsection}{\numberline {3.5}Further Comments on the final project}{22}% 
+\contentsline {subsubsection}{Hein}{22}% 
+\contentsline {subsubsection}{Karl}{22}% 
