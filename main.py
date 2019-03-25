@@ -44,8 +44,8 @@ def main():
               ('simple_agent', False),
               ('simple_agent', False)]
     gen = [13]
-    train_main(reagents, 10000, gen)
-    #game_main(reagents, 100, gen[0], True, False)
+    train_main(reagents, 1000, gen)
+    game_main(reagents, 100, gen[0], True, False)
     
 def train_main(agents, episodes, generations_list):
     '''
