@@ -115,7 +115,6 @@ This section is divided into the three crucial tasks for which we needed to deve
 		\label{forest_mlp_comp2}
 	\end{figure}
 
-
 	In order to get a feeling for the performance of both regressors, we used the function \code{sklearn.datasets.make\_regression} to create $10000$ samples with $100$ features of which $10$ are informative. We then trained the Random Forest Regressor and the MLP-Regressor with $80\%$ of the generated data and let both regressors predict the values of the remaining $20\%$ of the data. Figure \ref{forest_mlp_comp1} shows how much more accurate the MLP-regressor performs compared to the Random Forest Regressor. Figure \ref{forest_mlp_comp2} shows how the MLP-Regressor maintains the order of the instances much better than the Random Forest Regressor. In case of the latter, many values are sorted into completely other regions than where they actually belong. This is also due to the fact that the range of values of the generated data is of the same magnitude as the inaccuracies of the Forest. Still, the MLP manages to predict these values much better.
 
 	
