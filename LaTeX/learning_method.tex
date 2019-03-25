@@ -33,14 +33,42 @@ This section is divided into the three crucial tasks for which we needed to deve
 			\code{extras[1]} represents the danger level on the agents current position. It is calculated by $6 - \text{\code{bomb\_state[x,y]}}$, where \code{x} and \code{y} are the coordinates of the agents position. Consequently, this danger level in invers to the danger level in \code{bomb\_state}, i.e. $0$ means no danger, $1\dots4$ means increasing danger and $5\dots6$ would be bombs exploding. The least point is rather irrelevant since the agent would already have been deleted by the environment.
 			\item \textbf{Bomb action possible \state{0,1}}:\\
 			\code{extras[2]} is $1$ if the agent could place a bomb and $0$ if not (i.e. if an own bomb is still ticking).
-			\item \textbf{Touching enemy} \state{0,1}:\\
+			\item \textbf{Touching opponent} \state{0,1}:\\
 			\code{extras[3]} is $1$ if an opponent is on a neighbouring cell and $0$ if not.
 		\end{itemize}
 	\end{itemize}
 
 	After manipulating the data in the described way, all cells containing walls are deleted from the 2D-arrays \code{agent\_state}, \code{loot\_state} and \code{bomb\_state}. As already described above, this is done because these entries will always be the same and therefore never contribute to the learning of the agent. The three arrays are then flattened and concatenated after one another into the 1D-array \code{vector}. Finally, we append the \code{extras} to the \code{vector}, which is then returned by the function \code{create\_state\_vector}.\par
 	
-	With the described representation of a state we combined features which could be represented as seperate features into single features. For example in \cite{paper}, each cell has a feature \textit{Agent on cell?} and \textit{Opponent on cell?} which can both assume the values $0$ and $1$. We combined these two features. As we see it, a proper regressor should be able to determine the important features as well as the relevant range of values of a feature. A \textit{Random Forest Regressor}, for instance, should theoretically be able to do so since the way it works is to find the most relevant feature and its most divisive value.
+	With the described representation of a state we combined features which could be represented as seperate features into single features. For example in \cite{paper}, each cell has a feature \textit{Agent on cell?} and \textit{Opponent on cell?} which can both assume the values $0$ and $1$. We combined these two features. As we see it, a proper regressor should be able to determine the important features as well as the relevant range of values of a feature. A \textit{Random Forest Regressor}, for instance, should theoretically be able to do so since the way it works is to find the most relevant feature and its most divisive value.\par
+	
+	With \textit{state representation 1} ($532$ features), the feature space has at most about $5.4 \times 10^{320}$ possible states. 
+	% Calculated with 3^(17*17-34-30-49) * 3^(17*17-34-30-49) * 7^(17*17-34-30-49)*400*7*2*2
+	
+	\subsubsection{State representation 2}
+	As described later in section \ref{results}, our agent never managed to get out of its starting corner. In order to change that, we condensed the above state vector ($532$ features) into a much smaller state vector of $180$ features. The main idea of this smaller state vector is that agents, opponents, crates and coins can never occupy the same cell. Bombs could occupy the same cell as agents, opponents or coins, but for the sake of the agent they shouldn't:
+	
+	\begin{itemize}
+		\item For each cell:
+		\begin{itemize}
+			\item \textbf{Empty, agent, opponent, crate, coin, danger level} \state{0,1,2,4,5 \dots 11}:\\
+			Empty cells are $0$. Cells with agent, opponent, crate or coin are \state{1,2,3,4}, respectively. The values \state{5 \dots 11} represent the danger level because there is a bomb affecting the respective cell. $5$ is not used, \state{6 \dots 9} is the four-time-steps countdown, \state{10,11} the two-time-steps explosion. If there is a danger level the values \state{1,2,3,4} are overwritten. This means that the position of the agent might not be represented anymore in this feature.
+		\end{itemize}
+		\item Just once (implemented in our code as \code{extras})
+		\begin{itemize}
+			\item \textbf{Danger level} \state{6 \dots 11}:\\ 
+			\code{extras[0]} is the danger level at the position of the agent.
+			\item \textbf{Bomb action possible} \state{0,1}: \\
+			\code{extras[1]} is $1$ if the agent could place a bomb and $0$ if not (i.e. if an own bomb is still ticking).
+			\item \textbf{Touching opponent} \state{0,1}: \\
+			\code{extras[2]} is $1$ if an opponent is on a neighbouring cell and $0$ if not.
+			\item \textbf{Position of agent} \state{18 \dots 271}: \\
+			\code{extras[3]} is essentially the enumerated cell number of the agents position. It is calculated by $17x + y$, where $x$ and $y$ are the agents $x$- and $y$-coordinates. 
+		\end{itemize} 
+	\end{itemize}
+	
+	With \textit{state representation 2} (180 features) it has at most about $3.4 \times 10^{193}$ possible states, which is much less than with \textit{state representation 1}. For both representations, these are only upper limits. But both are calculated the same way so that these values are useful for comparisons between both representations.
+	% Calculated with 12^(17*17-34-30-49) * 6 * 2 * 2 * (17*17-34-30-49)
 	
 	\subsection{Rewards}
 	\chapterauthor{Karl Thyssen}
@@ -74,17 +102,19 @@ This section is divided into the three crucial tasks for which we needed to deve
 	\end{itemize}
 	Thus, we used the Forest with its default settings and changed the maximum number of iterations of the MLP to $500$ (default is $200$).
 	
-	In order to get a feeling for the performance of both regressors, we used the function \code{sklearn.datasets.make\_regression} to create $10000$ samples with $100$ features of which $10$ are informative. We then trained the Random Forest Regressor and the MLP-Regressor with $80\%$ of the generated data and let both regressors predict the values of the remaining $20\%$ of the data. Figure \ref{forest_mlp_comp1} shows how much more accurate the MLP-regressor performs compared to the Random Forest Regressor. Figure \ref{forest_mlp_comp2} shows how the MLP-Regressor maintains the order of the instances much better than the Random Forest Regressor. In case of the latter, many values are sorted into completely other regions than where they actually belong. This is also due to the fact that the range of values of the generated data is of the same magnitude as the inaccuracies of the Forest. Still, the MLP manages to predict these values much better.
-
-	\begin{figure}[t]
+	\begin{figure}[h]
 		\centering
 		\includegraphics[width=\linewidth]{images/mlp_forest_comparison01.png}
-		\caption{For this figure, \code{sklearn.datasets.make\_regression} was used to create $10000$ samples with $100$ features of which $10$ are informative. We then trained the Random Forest Regressor and the MLP-Regressor provided by \textit{scikit-learn} with $80\%$ of the generated data. The figure shows the predicted values of the remaining $20\%$ of the data which were used as a test set. The test set has previously been sorted by the true target value in ascending order.}
+		\caption{\textit{For this figure, {\normalfont \code{sklearn.datasets.make\_regression}} was used to create $10000$ samples with $100$ features of which $10$ are informative. We then trained the Random Forest Regressor and the MLP-Regressor provided by {\normalfont scikit-learn} with $80\%$ of the generated data. The figure shows the predicted values of the remaining $20\%$ of the data which were used as a test set. The test set has previously been sorted by the true target value in ascending order.}}
 		\label{forest_mlp_comp1}
 	\end{figure}
-	\begin{figure}[t]
+	\begin{figure}[h]
 		\centering
 		\includegraphics[width=\linewidth]{images/mlp_forest_comparison02.png}
-		\caption{This figure displays the same data as Figure \ref{forest_mlp_comp1}. Here, the x-axis represents the position of each instance sorted by its target value, the y-axis displays the position if the instances had been sorted by the predicted target values of the respective regressor. The more the predictions resemble the correct order (the green line) the better the regressor is suited for our task.}
+		\caption{\textit{This figure displays the same data as Figure \ref{forest_mlp_comp1}. Here, the x-axis represents the position of each instance sorted by its target value, the y-axis displays the position if the instances had been sorted by the predicted target values of the respective regressor. The more the predictions resemble the correct order (the green line) the better the regressor is suited for our task.}}
 		\label{forest_mlp_comp2}
 	\end{figure}
+
+	In order to get a feeling for the performance of both regressors, we used the function \code{sklearn.datasets.make\_regression} to create $10000$ samples with $100$ features of which $10$ are informative. We then trained the Random Forest Regressor and the MLP-Regressor with $80\%$ of the generated data and let both regressors predict the values of the remaining $20\%$ of the data. Figure \ref{forest_mlp_comp1} shows how much more accurate the MLP-regressor performs compared to the Random Forest Regressor. Figure \ref{forest_mlp_comp2} shows how the MLP-Regressor maintains the order of the instances much better than the Random Forest Regressor. In case of the latter, many values are sorted into completely other regions than where they actually belong. This is also due to the fact that the range of values of the generated data is of the same magnitude as the inaccuracies of the Forest. Still, the MLP manages to predict these values much better.
+
+	
